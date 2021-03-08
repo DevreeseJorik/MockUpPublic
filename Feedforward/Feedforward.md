@@ -1,18 +1,19 @@
 # Projectgegevens
 
-**VOORNAAM NAAM:** Plaats hier jouw voornaam & naam.
+**VOORNAAM NAAM:** Jorik Devreese
 
-**Sparringpartner:** schrijf hier de naam van jouw sparring partner. Deze persoon is jouw klankbord, redder in nood, motivator, partner in crime :-)
+**Sparringpartner:** Louis Marcel Declerck
 
-**Projectsamenvatting in max 10 woorden:** schrijf hier jouw samenvatting
+**Projectsamenvatting in max 10 woorden:** Een automatische cocktail dispenser
 
-**Projecttitel:** plaats hier een catchy werktitel van jouw project
+**Projecttitel:** MockUp
 
 # Tips voor feedbackgesprekken
 
 ## Voorbereiding
 
-> Bepaal voor jezelf waar je graag feedback op wil. Schrijf op voorhand een aantal punten op waar je zeker feedback over wil krijgen. Op die manier zal het feedbackgesprek gerichter verlopen en zullen vragen, die je zeker beantwoord wil hebben, aan bod komen.
+> Is de keuze van sensoren goed?
+> 
 
 ## Tijdens het gesprek:
 
