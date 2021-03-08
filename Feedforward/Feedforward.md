@@ -6,7 +6,7 @@
 
 **Projectsamenvatting in max 10 woorden:** Een automatische cocktail dispenser
 
-**Projecttitel:** Cockatool
+**Projecttitel:** MockUp
 
 # Tips voor feedbackgesprekken
 
