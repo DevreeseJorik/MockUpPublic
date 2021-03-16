@@ -12,9 +12,6 @@
 
 ## Voorbereiding
 
-> Is de keuze van sensoren goed?
-> 
-
 ## Tijdens het gesprek:
 
 > **Luister actief:** Schiet niet onmiddellijk in de verdediging maar probeer goed te luisteren. Laat verbaal en non-verbaal ook zien dat je aandacht hebt voor de feedback door een open houding (oogcontact, rechte houding), door het maken van aantekeningen, knikken...
