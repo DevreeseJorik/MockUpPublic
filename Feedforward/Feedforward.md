@@ -33,14 +33,14 @@
 
 # Feedforward gesprekken
 
-## Gesprek 1 (Datum: dd/mm/yyyy)
+## Gesprek 1 (Datum: 16/03/2021)
 
-Lector:
+Lector:Claudia, Geert
 
 Vragen voor dit gesprek:
 
-- [x] vraag 1:
-- [ ] vraag 2:
+- [x] vraag 1: Zou ik met een basis fan heatsink van een laptop een peltier module kunnen koel houden?
+- [ ] vraag 2: 
 
 Dit is de feedback op mijn vragen.
 
