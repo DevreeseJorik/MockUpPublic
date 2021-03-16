@@ -40,17 +40,21 @@ Lector:Claudia, Geert
 Vragen voor dit gesprek:
 
 - [x] vraag 1: Zou ik met een basis fan heatsink van een laptop een peltier module kunnen koel houden?
-- [ ] vraag 2: 
+- [ ] vraag 2: Is de keuze van sensoren goed?
 
 Dit is de feedback op mijn vragen.
 
-- feedback 1
-- feedback 2
+- feedback 1:  
+    Ik koop best een Peltier module met ingebouwde fan in een set, dan hoef ik het zelf niet een koelfan te monteren.
+- feedback 2: 
+    Er werd voorgesteld de water level sensor te veranderen naar load cell, alsook de ultrasonische sensor naar een load cell. 
+    Om keuze te maken van drank gebruik ik best een potentiometer. Met de load cells kunnen we ook meten wat het verschil is in drank tussen de fles en het glas, om na te kijken of alles is doorgepompt.
+
 
 Hier komt de feedforward: wat ga ik concreet doen?
 
-- [ ] ToDo 1
-- [ ] ToDo 2
+- [ ] ToDo 1: BOM aanpassen aan met nieuwe sensoren, het FA01 document updaten met de nieuwe componenten.     
+- [ ] ToDo 2: Een leuk idee: een randomiser functie (I'm feeling lucky?) toevoegen om drank te mixen. 
 
 ## Gesprek 2 (Datum: dd/mm/yyyy)
 
