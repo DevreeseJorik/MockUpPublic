@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>MockUp - Jorik Devreese</title>
+        <title>Jorik Devreese - Examen User Interface Design</title>
         <meta name="description" content="This is my HTML5 boilerplate.">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="msapplication-TileColor" content="#e85e00">
@@ -17,7 +17,9 @@
         <link rel="stylesheet" href="style/screen.css">
 
         <script src="https://cdn.socket.io/4.0.1/socket.io.min.js" integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.3.0/dist/chart.min.js"></script>
         <script src="script/app.js"></script>
+
     </head>
     <body>
         <header class="o-row o-row--md u-header">
@@ -30,8 +32,8 @@
                     <div class="c-header__nav">
                         <nav class="c-nav">
                             <ul class="o-list c-nav__list">
-                                <li class="c-nav__item"><a href="Home.html" class="c-nav__link">Cocktail Menu</a></li>
-                                <li class="c-nav__item"><a href="#!l" class="c-nav__link">Stats</a></li>
+                                <li class="c-nav__item"><a href="Menu.html" class="c-nav__link">Cocktail Menu</a></li>
+                                <li class="c-nav__item"><a href="#!" class="c-nav__link">Stats</a></li>
                                 <li class="c-nav__item"><a href="#!" class="c-nav__link">Project</a></li>
                                 <li class="c-nav__item"><a href="#!" class="c-nav__link">About Us</a></li>
                             </ul>
@@ -39,9 +41,9 @@
                     </div>
                     <div class="c-header__nav">
                         <nav class="c-nav">
-                            <ul class="o-list c-nav__list">
+                            <!-- <ul class="o-list c-nav__list">
                                 <li class="c-nav__item c-nav__item--cta"><a href="#!" class="c-link-pap">Pick A Plan</a></li>
-                            </ul>
+                            </ul> -->
                         </nav>
                     </div>
                 </div>
@@ -49,7 +51,7 @@
 
             <section class="o-row">
                 <div class="o-container">
-                    <div class="o-layout o-layout--gutter o-layout--align-center o-layout--row">
+                    <div class="o-layout o-layout--gutter-lg o-layout--align-center o-layout--row">
                         <div class="o-layout__item u-1-of-2-bp3 u-3-of-5-bp4">
                             <figure class="c-figure">
                                 <img class ="vis" src="img/cocktail.jpg" alt="Intro visual">
@@ -64,6 +66,9 @@
                                 <p class="u-mb-lg u-typography-third-base">
                                     Discover what cocktails your customers prefer.</p>
                                 <p>
+                                    <!-- <a class="c-link-pap" href="#!">
+                                        Random Cocktail
+                                    </a> -->
                                 </p>
                             </div>
                         </div>
@@ -72,8 +77,8 @@
             </section>
         </header>
 
-        <section class="cocktail_section">
-
+        <section class="analytics_section">
+            <canvas class="chart" id="myChart"></canvas>
         </section>
     </body>
 </html>

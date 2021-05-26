@@ -388,6 +388,10 @@ a:focus {
 #COMPONENTS
 \*------------------------------------*/
 
+
+
+
+
 /*------------------------------------*\
 #COMPONENTS
 \*------------------------------------*/
@@ -413,6 +417,11 @@ a:focus {
   ---
   Main header of the website
 */
+
+.note {
+  font-size: 16px;
+  color: rgb(240, 240, 240)
+}
 
 .c-header__nav {
   display: none;

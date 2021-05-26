@@ -105,18 +105,37 @@ class DataRepository:
         params = [id]
         return Database.get_rows(sql,params)
 
+    @staticmethod
+    def get_latest_rows_device_history(limit):
+        sql = "SELECT h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid order by date desc limit %s"
+        params = [limit]
+        return Database.get_rows(sql,params)
+
+    @staticmethod
+    def get_latest_rows_sensor_history(limit):
+        sql = 'SELECT h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" order by date desc limit %s'
+        params = [limit]
+        return Database.get_rows(sql,params)
+
+    @staticmethod
+    def get_latest_rows_actuator_history(limit):
+        sql = 'SELECT h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "actuator" order by date desc limit %s'
+        params = [limit]
+        return Database.get_rows(sql,params)
+
+
     # Putting data
 
     # cocktails
 
     @staticmethod
-    def put_cocktail_history(id, comment="Null"):
+    def put_cocktail_history(id, comment=None):
         sql = "insert into cocktailhistory(cocktailId,comments) values(%s,%s)"
         params = [id, comment]
         return Database.execute_sql(sql, params)
 
     @staticmethod
-    def put_device_history(device_id,action_id=0,value=0,comment="Null"):
+    def put_device_history(device_id,action_id=None,value=0,comment=None):
         sql = "insert into devicehistory(deviceid,actionid,value,comments) values(%s,%s,%s,%s)"
         params = [device_id,action_id,value,comment]
         return Database.execute_sql(sql, params)

@@ -2,22 +2,30 @@ import time
 from RPi import GPIO
 from helpers.klasseknop import Button
 import threading
+import serial
 
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 from flask import Flask, jsonify
 from repositories.DataRepository import DataRepository
 
+import random
 
 # Code voor Hardware
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
-led3 = 21
-knop1 = Button(20)
+# led3 = 21
+# knop1 = Button(20)
 
-GPIO.setup(led3, GPIO.OUT)
-GPIO.output(led3, GPIO.LOW)
+sensor_file_name = '/sys/bus/w1/devices/28-031897793fdc/w1_slave'
+sensor_file = open(sensor_file_name, 'r')
+
+ser = serial.Serial('/dev/ttyS0', 9600, timeout=2)
+print(ser.name)
+
+# GPIO.setup(led3, GPIO.OUT)
+# GPIO.output(led3, GPIO.LOW)
 # Code voor Flask
 
 app = Flask(__name__)
@@ -32,45 +40,107 @@ CORS(app)
 def error_handler(e):
     print(e)
 
+# SERIAL 
 
-# START een thread op. Belangrijk!!! Debugging moet UIT staan op start van de server, anders start de thread dubbel op
-# werk enkel met de packages gevent en gevent-websocket.
-# def all_out():
-#     while True:
-#         print('*** We zetten alles uit **')
-#         GPIO.output(led3, 0)
-#         time.sleep(15)
+def get_ser():
+    while True:
+        if ser.in_waiting > 0:
+            line = ser.readline().decode('utf-8').rstrip()  # recieve data from arduino
+            if "Val" in line:
+                print(f"\nReceiving Serial:\n{line}")
+            time.sleep(0.001)
 
-# thread = threading.Timer(15, all_out)
-# thread.start()
 
+def send_ser(text=""):
+    ser.write(f"{text}\n".encode('utf-8'))  # send data from pi
+
+
+
+
+# START THREAD
+
+def read_temp():
+        print('\n*** Reading temperature **')
+        sensor_file = open(sensor_file_name, 'r')
+        for line in sensor_file:
+            if 't=' in line:
+                line = line.strip("\n")
+                line = line.split('t=')
+                temperatuur = float(line[1])/1000
+                print(f"De temperatuur is: {temperatuur}° Celsius")
+        sensor_file.close()
+        return temperatuur
+
+def slow_loop():
+    while True:
+        temp_val = read_temp()
+        DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
+        send_ser("Sen:1")
+        time.sleep(10)
+        
+
+
+thread = threading.Timer(10, slow_loop)
+thread.start()
+
+thread2 = threading.Timer(0.001, get_ser)
+thread2.start()
 
 print("**** Program started ****")
 
 # API ENDPOINTS
 
-
 @app.route('/')
 def hallo():
-    return "Server is running, er zijn momenteel geen API endpoints beschikbaar."
+    return "Server is running, no API endpoints available."
 
 
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
     # # Send to the client!
-    # vraag de status op van de lampen uit de DB
-    cocktails = DataRepository.read_all_cocktails()
-    # print(cocktails)
-    emit('B2F_cocktails', {'cocktails': cocktails}, broadcast=True)
+
+@socketio.on("F2B_request_data")
+def return_main_data(data):
+    print(data["url"])
+    if data["url"] == "Menu.html":
+        cocktails = DataRepository.read_all_cocktails()
+        emit('B2F_cocktails', {'cocktails': cocktails})
+    if data["url"] == "Stats.html":
+        # print(data["limit"])
+        data = DataRepository.get_latest_rows_device_history(data["limit"])
+        emit('B2F_history_device', {'history': data})
+
+@socketio.on("F2B_history_device")
+def return_history_device(data):
+    time.sleep(10)
+    data = DataRepository.get_latest_rows_device_history(data["limit"])
+    emit('B2F_history_device', {'history': data})
 
 @socketio.on('F2B_request_cocktail')
 def listen_to_cocktail_request(data):
     cocktail_id = data["cocktail_id"]
+
+    if str(cocktail_id) == "random":
+        print("\nUser chose random drink!")
+        make_random_recipe()
+        return
+
     # print(f"Received request to make cocktail: {cocktail_id}")
     recipe = DataRepository.get_recipe_by_cocktail_id(cocktail_id)
     make_cocktail(recipe,cocktail_id)
-    
+
+# Other functions
+
+def make_random_recipe():
+    beverage_data = DataRepository.get_all_beverages()
+    count_data = len(beverage_data)
+    amount_of_ingredients = random.randint(2,4)
+    ingredients = random.sample(range(0, count_data), amount_of_ingredients)
+    volume = random.sample(range(40,80),amount_of_ingredients)
+    json_ = {ingredients[i]:volume[i] for i in range(amount_of_ingredients)}
+    print(json_)
+
 def make_cocktail(recipe,cocktail_id):
     comment = "Null"
     cocktail = DataRepository.get_cocktail_by_id(cocktail_id)
@@ -86,28 +156,6 @@ def make_cocktail(recipe,cocktail_id):
 
     # once cocktail has been confirmed finished:
     # DataRepository.put_cocktail_history(cocktail_id,comment)
-
-# @socketio.on('F2B_switch_light')
-# def switch_light(data):
-#     # Ophalen van de data
-#     lamp_id = data['lamp_id']
-#     new_status = data['new_status']
-#     print(f"Lamp {lamp_id} wordt geswitcht naar {new_status}")
-
-#     # Stel de status in op de DB
-#     res = DataRepository.update_status_lamp(lamp_id, new_status)
-
-#     # Vraag de (nieuwe) status op van de lamp en stuur deze naar de frontend.
-#     data = DataRepository.read_status_lamp_by_id(lamp_id)
-#     socketio.emit('B2F_verandering_lamp', {'lamp': data}, broadcast=True)
-
-#     # Indien het om de lamp van de TV kamer gaat, dan moeten we ook de hardware aansturen.
-#     if lamp_id == '3':
-#         print(f"TV kamer moet switchen naar {new_status} !")
-#         GPIO.output(led3, new_status)
-
-# ANDERE FUNCTIES
-
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')
