@@ -1,6 +1,8 @@
 import time
 from RPi import GPIO
 from helpers.klasseknop import Button
+from repositories.OneWireRepo import OneWire
+from repositories.ShiftRepo import ShiftRegister
 import threading
 import serial
 
@@ -17,9 +19,6 @@ GPIO.setmode(GPIO.BCM)
 
 # led3 = 21
 # knop1 = Button(20)
-
-sensor_file_name = '/sys/bus/w1/devices/28-031897793fdc/w1_slave'
-sensor_file = open(sensor_file_name, 'r')
 
 ser = serial.Serial('/dev/ttyS0', 9600, timeout=2)
 print(ser.name)
@@ -54,32 +53,19 @@ def get_ser():
 def send_ser(text=""):
     ser.write(f"{text}\n".encode('utf-8'))  # send data from pi
 
-
-
-
 # START THREAD
 
-def read_temp():
-        print('\n*** Reading temperature **')
-        sensor_file = open(sensor_file_name, 'r')
-        for line in sensor_file:
-            if 't=' in line:
-                line = line.strip("\n")
-                line = line.split('t=')
-                temperatuur = float(line[1])/1000
-                print(f"De temperatuur is: {temperatuur}° Celsius")
-        sensor_file.close()
-        return temperatuur
-
 def slow_loop():
-    while True:
-        temp_val = read_temp()
-        DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
-        send_ser("Sen:1")
-        time.sleep(10)
-        
-
-
+    try:
+        one_wire = OneWire()
+        while True:
+            temp_val = one_wire.read_temp()
+            DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
+            send_ser("Sen:1")
+            time.sleep(10)
+    except KeyboardInterrupt:
+        print("Quitting programm")
+            
 thread = threading.Timer(10, slow_loop)
 thread.start()
 
