@@ -17,5 +17,3 @@ class SerialRepository:
     @staticmethod
     def send_ser(text=""):
         ser.write(f"{text}\n".encode('utf-8'))  # send data from pi
-
-

@@ -141,7 +141,7 @@ class DataRepository:
         return Database.execute_sql(sql, params)
 
     @staticmethod
-    def put_device_history(device_id,action_id=None,value=0,comment=None):
+    def put_device_history(device_id,action_id=None,value=None,comment=None):
         sql = "insert into devicehistory(deviceid,actionid,value,comments) values(%s,%s,%s,%s)"
         params = [device_id,action_id,value,comment]
         return Database.execute_sql(sql, params)
@@ -154,10 +154,3 @@ class DataRepository:
         sql = "update beverage set currentVolume = %s where id = %s"
         params = [id,current_volume]
         return Database.execute_sql(sql, params)
-
-    
-    
-
-
-
-    

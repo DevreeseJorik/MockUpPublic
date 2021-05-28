@@ -119,6 +119,8 @@ class Cocktail:
             beverage_name = beverage["beverageName"]
             print(f"\t{volume} ml {beverage_name}")
             SerialRepository.send_ser(f"Act:{beverage_id}:{volume}")
+            DataRepository.put_device_history(device_id=beverage_id+1,action_id=1,value=volume,comment=str(cocktail_name))
         SerialRepository.send_ser("Act:Fin")
         self.__waiting = True
+        DataRepository.put_cocktail_history(cocktail_id,str(cocktail_name))
  
