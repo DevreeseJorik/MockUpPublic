@@ -1,85 +1,74 @@
 import time
-from RPi import GPIO
-from helpers.klasseknop import Button
-from repositories.OneWireRepo import OneWire
-from repositories.ShiftRepo import ShiftRegister
 import threading
-import serial
+from RPi import GPIO
 
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 from flask import Flask, jsonify
-from repositories.DataRepository import DataRepository
 
-import random
+from repositories.DataRepository import DataRepository
+from repositories.Cocktail import Cocktail
+# from repositories.Rotary import Rotary
+from repositories.OneWire import OneWire
+from repositories.SerialRepository import SerialRepository
+# from repositories.LCDdisplay import Display
+# from helpers.klasseknop import Button
+
+GPIO.setwarnings(False)
+
+one_wire = OneWire()
+# display = Display()
+cocktail = Cocktail()
 
 # Code voor Hardware
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
-# led3 = 21
-# knop1 = Button(20)
 
-ser = serial.Serial('/dev/ttyS0', 9600, timeout=2)
-print(ser.name)
-
-# GPIO.setup(led3, GPIO.OUT)
-# GPIO.output(led3, GPIO.LOW)
-# Code voor Flask
+# Flask
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'geheim!'
 socketio = SocketIO(app, cors_allowed_origins="*", logger=False,
                     engineio_logger=False, ping_timeout=1)
-
 CORS(app)
-
 
 @socketio.on_error()        # Handles the default namespace
 def error_handler(e):
     print(e)
 
-# SERIAL 
-
-def get_ser():
-    while True:
-        if ser.in_waiting > 0:
-            line = ser.readline().decode('utf-8').rstrip()  # recieve data from arduino
-            if "Val" in line:
-                print(f"\nReceiving Serial:\n{line}")
-            time.sleep(0.001)
-
-
-def send_ser(text=""):
-    ser.write(f"{text}\n".encode('utf-8'))  # send data from pi
-
-# START THREAD
+# Start Thread
 
 def slow_loop():
-    try:
-        one_wire = OneWire()
         while True:
             temp_val = one_wire.read_temp()
-            DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
-            send_ser("Sen:1")
+            # DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
+            # SerialRepository.send_ser("Sen:1")
             time.sleep(10)
-    except KeyboardInterrupt:
-        print("Quitting programm")
-            
+
+def fast_loop():
+        while True:
+            line = SerialRepository.get_ser()
+            if "Val" in line:
+                print(f"\nReceiving Serial:\n{line}")
+
+            if line == "Finished cocktailprocess":
+                print(f"Drink has been completed")
+                cocktail.make_next_cocktail_from_queue()
+
 thread = threading.Timer(10, slow_loop)
 thread.start()
 
-thread2 = threading.Timer(0.001, get_ser)
+thread2 = threading.Timer(0.001, fast_loop)
 thread2.start()
 
 print("**** Program started ****")
 
-# API ENDPOINTS
+# API endpoints
 
 @app.route('/')
 def hallo():
     return "Server is running, no API endpoints available."
-
 
 @socketio.on('connect')
 def initial_connection():
@@ -109,39 +98,14 @@ def listen_to_cocktail_request(data):
 
     if str(cocktail_id) == "random":
         print("\nUser chose random drink!")
-        make_random_recipe()
+        cocktail.make_random_recipe()
         return
 
     # print(f"Received request to make cocktail: {cocktail_id}")
     recipe = DataRepository.get_recipe_by_cocktail_id(cocktail_id)
-    make_cocktail(recipe,cocktail_id)
+    cocktail.make_cocktail(recipe,cocktail_id)
 
-# Other functions
-
-def make_random_recipe():
-    beverage_data = DataRepository.get_all_beverages()
-    count_data = len(beverage_data)
-    amount_of_ingredients = random.randint(2,4)
-    ingredients = random.sample(range(0, count_data), amount_of_ingredients)
-    volume = random.sample(range(40,80),amount_of_ingredients)
-    json_ = {ingredients[i]:volume[i] for i in range(amount_of_ingredients)}
-    print(json_)
-
-def make_cocktail(recipe,cocktail_id):
-    comment = "Null"
-    cocktail = DataRepository.get_cocktail_by_id(cocktail_id)
-    cocktail_name = cocktail["name"]
-    print(f"\nUser requested {cocktail_name}")
-    print("The recipe is as follows:")
-    for element in recipe:
-        beverage_id = element["beverageId"]
-        volume = element["volume"]
-        beverage = DataRepository.get_beverage_by_id(beverage_id)
-        beverage_name = beverage["beverageName"]
-        print(f"\t{volume*10**3} ml {beverage_name}")
-
-    # once cocktail has been confirmed finished:
-    # DataRepository.put_cocktail_history(cocktail_id,comment)
+# Other functions (redundant: moved to own repositories)
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')

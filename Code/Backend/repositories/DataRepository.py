@@ -1,3 +1,4 @@
+from os import stat
 from .Database import Database
 
 
@@ -15,8 +16,13 @@ class DataRepository:
     # cocktails
 
     @staticmethod
+    def get_total_cocktails():
+        sql = "select count(cocktailId) as count FROM cocktail;"
+        return Database.get_one_row(sql)
+
+    @staticmethod
     def read_all_cocktails():
-        sql = "SELECT * from cocktail"
+        sql = "select * from cocktail"
         return Database.get_rows(sql)
 
     @staticmethod
@@ -27,7 +33,7 @@ class DataRepository:
 
     @staticmethod
     def get_all_recipes():
-        sql = "SELECT * from mix"
+        sql = "select * from mix"
         return Database.get_rows(sql)
 
     @staticmethod
@@ -44,7 +50,7 @@ class DataRepository:
 
     @staticmethod
     def get_all_beverages():
-        sql = "SELECT * from beverage"
+        sql = "select * from beverage"
         return Database.get_rows(sql)
 
     @staticmethod
@@ -55,7 +61,7 @@ class DataRepository:
 
     @staticmethod 
     def get_cocktail_history():
-        sql = "SELECT * from cocktailhistory"
+        sql = "select * from cocktailhistory"
         return Database.get_rows(sql)
 
     @staticmethod 
@@ -107,19 +113,19 @@ class DataRepository:
 
     @staticmethod
     def get_latest_rows_device_history(limit):
-        sql = "SELECT h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid order by date desc limit %s"
+        sql = "select h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid order by date desc limit %s"
         params = [limit]
         return Database.get_rows(sql,params)
 
     @staticmethod
     def get_latest_rows_sensor_history(limit):
-        sql = 'SELECT h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" order by date desc limit %s'
+        sql = 'select h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" order by date desc limit %s'
         params = [limit]
         return Database.get_rows(sql,params)
 
     @staticmethod
     def get_latest_rows_actuator_history(limit):
-        sql = 'SELECT h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "actuator" order by date desc limit %s'
+        sql = 'select h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "actuator" order by date desc limit %s'
         params = [limit]
         return Database.get_rows(sql,params)
 

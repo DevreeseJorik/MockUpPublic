@@ -20,6 +20,7 @@ const addCocktails = function (jsonObject) {
   // console.log(htmlCocktail);
   let dataCocktails = "";
   for (let cocktail of jsonObject.cocktails) {
+    if (cocktail.cocktailId != 0) {
 
     let rowOrder = "";
 
@@ -52,6 +53,7 @@ const addCocktails = function (jsonObject) {
                         </div>
                     </div>
                 </article>`
+  }
   };
   htmlCocktail.innerHTML = dataCocktails;
   listenToUIMenu();

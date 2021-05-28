@@ -1,26 +1,29 @@
-from repositories.ShiftRepo import ShiftRegister
+import smbus
 import time
-from RPi import GPIO
+ 
+LED1 = 0x01
+bus = smbus.SMBus(1)
 
-try: 
-    
-    shift = ShiftRegister()
-    shift.setup()
+try:
     while True:
-        shift.change_state_pump(0,1)
-        time.sleep(1)
-        shift.change_state_pump(3,1)
-        time.sleep(1)
-        shift.set_all_pumps(0)
-        time.sleep(1)
-
-        # for i in range(6):
-        #     print(f"Enabling {i}")
-        #     shift.write_byte((1<<i)^0xFF)
-        #     time.sleep(1)
-        #     print("Writing 1")
-        # time.sleep(1)
-except Exception:
-    shift.set_all_pumps(0)
+        for i in range(6):
+            state = 1 << i
+            print(state)
+            bus.write_byte(0x38,state^0xFF)
+            time.sleep(1)
 except KeyboardInterrupt:
-    shift.set_all_pumps(0)
+    bus.write_byte(0x38,0x0^0xFF)
+
+
+# from repositories.pcfRepo import Pcf8574
+
+# SDA = 21
+# SCL = 6    
+# Pcf8574 = Pcf8574(SDA,SCL,0x20)
+# my_address = Pcf8574.search_addresses(SDA,SCL)    
+# print()    
+# print("volgende adressen gevonden :")    
+# print(my_address)    
+# print("test om alles op 1 te zetten")    
+# mypcf = Pcf8574(SDA,SCL,my_address[0])    
+# mypcf.write_outputs(255) 

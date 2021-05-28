@@ -1,5 +1,3 @@
-from RPi import GPIO
-
 class OneWire:
     def __init__(self, device_id="28-3c01d07567bf"): #28-031897793fdc for test tempsensor
         self.device_id = device_id

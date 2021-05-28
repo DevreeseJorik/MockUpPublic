@@ -28,7 +28,7 @@ class ShiftRegister:
         GPIO.setup([self.ds_pin, self.oe_pin, self.shcp_pin,
                     self.stcp_pin, self.mr_pin], GPIO.OUT, initial=GPIO.LOW)
         GPIO.output(self.mr_pin, GPIO.HIGH)
-        self.write_byte(0xFF)
+        self.write_byte(0x0)
 
     def write_one_bit(self, value):
         GPIO.output(self.ds_pin, value)
@@ -73,11 +73,19 @@ class ShiftRegister:
         self.copy_to_storage_register()
 
     def change_state_pump(self,id,state):
+        mask = 0
+        for i in range(8):
+            if i == id:
+                mask = mask | 0 << i
+            else:
+                mask = mask | 1 << i
+
         value = state<<id
-        print(bin(value))
-        self.value_pumps = self.value_pumps | value
-        print(bin(self.value_pumps))
-        self.write_byte(self.value_pumps^0xFF)
+        # print(bin(value))
+        # print("Mask", mask)
+        self.value_pumps = (self.value_pumps & mask) | value
+        # print(bin(self.value_pumps))
+        self.write_byte(self.value_pumps)
 
     def set_all_pumps(self,state=1):
         value = 0
@@ -85,7 +93,8 @@ class ShiftRegister:
             for i in range(self.amount_pumps):
                 value | state << i
             self.value_pumps = value
-            self.write_byte(self.value_pumps^0xFF)
+            self.write_byte(self.value_pumps)
+            print(self.vale)
         else: 
             return "state must be 0 or 1"
 
