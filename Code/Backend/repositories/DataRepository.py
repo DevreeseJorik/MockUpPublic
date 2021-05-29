@@ -140,6 +140,8 @@ class DataRepository:
         params = [id, comment]
         return Database.execute_sql(sql, params)
 
+    # devices
+
     @staticmethod
     def put_device_history(device_id,action_id=None,value=None,comment=None):
         sql = "insert into devicehistory(deviceid,actionid,value,comments) values(%s,%s,%s,%s)"
