@@ -39,7 +39,7 @@ class Cocktail:
         if clk_state != self.clk_last_state and clk_state == False:
             if dt_state != clk_state:
                 self.counter -= 1
-                if self.counter < -2:
+                if self.counter < -1:
                     max_cocktails = DataRepository.get_total_cocktails()["count"]
                     self.rotary_id = (self.rotary_id  - 1) % max_cocktails
                     if self.rotary_id < 0:
@@ -47,7 +47,7 @@ class Cocktail:
                     display.display_drink_with_row_number(self.rotary_id)
             else:
                 self.counter += 1
-                if self.counter > 2:
+                if self.counter > 1:
                     self.counter = 0
                     max_cocktails = DataRepository.get_total_cocktails()["count"]
                     self.rotary_id = (self.rotary_id  + 1) % max_cocktails
@@ -64,7 +64,6 @@ class Cocktail:
             print(f"Received request to make cocktail: {self.rotary_id}")
             recipe = DataRepository.get_recipe_by_cocktail_id(self.rotary_id)
             self.make_cocktail(recipe,self.rotary_id)
-
 
     def add_cocktail_to_queue(self,recipe,cocktail_id):
         self.__queue.append([recipe,cocktail_id])
@@ -120,6 +119,7 @@ class Cocktail:
             print(f"\t{volume} ml {beverage_name}")
             SerialRepository.send_ser(f"Act:{beverage_id}:{volume}")
             DataRepository.put_device_history(device_id=beverage_id+1,action_id=1,value=volume,comment=str(cocktail_name))
+        
         SerialRepository.send_ser("Act:Fin")
         self.__waiting = True
         DataRepository.put_cocktail_history(cocktail_id,str(cocktail_name))

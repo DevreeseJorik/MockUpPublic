@@ -59,17 +59,6 @@ img {
   vertical-align: top;
 }
 
-.vis {
-  display:none;
-}
-
-@media (min-width: 769px) {
-  .vis {
-      display:block;
-  }
-}
-
-
 /*
   Elements: typography
   ---
@@ -220,6 +209,7 @@ a:focus {
   margin-left: auto;
   margin-right: auto;
   max-width: 90em; /* 71 * 18px = 1278px */
+  flex-wrap: wrap;
 }
 
 /*
@@ -408,12 +398,15 @@ a:focus {
   color:#f7f7f7;
 }
 
-.c-logo__symbol {
-  height: 100%;
+@media (max-width: 992px) {
+  .c-logo {
+    margin-left: 24px;
+  }
 }
 
+
 /*
-  Component: header
+  Component: header/intro
   ---
   Main header of the website
 */
@@ -421,10 +414,6 @@ a:focus {
 .note {
   font-size: 16px;
   color: rgb(240, 240, 240)
-}
-
-.c-header__nav {
-  display: none;
 }
 
 .u-header {
@@ -443,6 +432,14 @@ a:focus {
       display: block;
   }
 }
+
+
+@media (min-width: 992px) {
+  .c-intro {
+    background-color:#080808;
+  }
+}
+
 
 /*
   Component: footer
@@ -498,22 +495,6 @@ a:focus {
       width: auto;
   }
 
-  /*
-      Bonus: real centering with CSS
-      Checkout: https://css-tricks.com/centering-css-complete-guide/
-  */
-
-  /* .c-footer__logo {
-      width: auto;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-  }
-
-  .c-footer__logo .c-logo {
-      margin-bottom: 0;
-  } */
 }
 
 /*
@@ -553,8 +534,21 @@ a:focus {
   .c-nav__list {
       display: flex;
       align-items: center;
-      /* margin-left: -16px;
-      margin-right: -16px; */
+  }
+
+  .c-nav__link {
+      padding: 12px 16px;
+  }
+
+  .c-nav__item--cta {
+      margin-left: 16px;
+  }
+}
+
+@media (max-width: 992px) {
+  .c-nav__list {
+      display: flex;
+      align-items: left;
   }
 
   .c-nav__link {
@@ -590,6 +584,14 @@ a:focus {
   font-size: 32px;
   line-height: 40px;
 }
+
+@media (max-width: 992px) {
+  .c-lead--lg {
+      font-size: 24px;
+      line-height: 24px;
+  }
+} 
+
 
 
 /*
@@ -673,7 +675,6 @@ a:focus {
   background-size: 400% auto;
 }
 
-.c-link-pap,
 .c-link-pap:visited,
 .c-link-pap:active {
   color: #FFFFFF;
@@ -682,7 +683,6 @@ a:focus {
 .c-link-pap:hover {
   color: #fff;
   background: #72C9D2;
-  background-position: right center;
 }
 
 .c-link-lm {
@@ -702,10 +702,93 @@ a:focus {
   background-position: right center;
 }
 
+@media (max-width: 992px) {
+
+  .intro-sec {
+    display:flex;
+    justify-content: center;
+  }
+
+  .c-link-pap {
+    margin-top:20px;
+    display:block;
+    justify-content: center;
+    white-space: nowrap
+  }
+}
+
+
+/*
+  Component: cocktailbuttons
+  ---
+  Customise cocktailbuttons
+*/
+
+  /*
+    Component: cocktailbuttons
+    ---
+    Customise cocktailbuttons
+  */
+
+ .c-cocktail {
+  width:160px; 
+  height:200px; 
+  margin-bottom:72px;
+  margin-left: 15px;
+  margin-right: 15px;
+  
+ }
+ 
+
+.c-cocktail-img {
+    border-radius: 30px;
+}
+
+
+  .c-cocktail-txt {
+    bottom: 232px;
+    width:0px;
+    margin-left: 16px;
+    white-space: nowrap;
+    position: relative;
+    text-align: left;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    color: rgba(255,255,255,1);
+
+  }
+
+
+.c-cocktail-alc {
+    font-weight: 200px;
+}
+
+.c-cocktail-make {
+  bottom:130px;
+}
+
 
 /*------------------------------------*\
 #UTILITIES
 \*------------------------------------*/
+
+/*
+  Utilities: Show data
+  ---
+  Show this only on big screen
+*/
+
+.wide-screen-only {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .wide-screen-only {
+      display:inline-block;
+  }
+}
 
 
 /*
@@ -900,43 +983,8 @@ a:focus {
   }
 }
 
-@media (min-width: 768px) {
-  .u-1-of-2-bp2 {
-      flex-basis: calc(100% / 2) !important;
-  }
-  .u-1-of-3-bp2 {
-      flex-basis: calc(100% / 3) !important;
-  }
-  .u-2-of-3-bp2 {
-      flex-basis: calc(100% / 3 * 2) !important;
-  }
-  .u-1-of-4-bp2 {
-      flex-basis: calc(100% / 4) !important;
-  }
-  .u-3-of-4-bp2 {
-      flex-basis: calc(100% / 4 * 3) !important;
-  }
-  .u-1-of-5-bp2 {
-      flex-basis: calc(100% / 5) !important;
-  }
-  .u-2-of-5-bp2 {
-      flex-basis: calc(100% / 5 * 2) !important;
-  }
-  .u-3-of-5-bp2 {
-      flex-basis: calc(100% / 5 * 3) !important;
-  }
-  .u-4-of-5-bp2 {
-      flex-basis: calc(100% / 5 * 4) !important;
-  }
-  .u-1-of-6-bp2 {
-      flex-basis: calc(100% / 6) !important;
-  }
-  .u-5-of-6-bp2 {
-      flex-basis: calc(100% / 6 * 5) !important;
-  }
-}
 
-@media (min-width: 992px) {
+@media (min-width: 0px) {
   .u-1-of-2-bp3 {
       flex-basis: calc(100% / 2) !important;
   }

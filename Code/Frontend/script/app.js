@@ -19,41 +19,81 @@ const addCocktails = function (jsonObject) {
   let htmlCocktail = document.querySelector(".cocktail_section");
   // console.log(htmlCocktail);
   let dataCocktails = "";
-  for (let cocktail of jsonObject.cocktails) {
-    if (cocktail.cocktailId != 0) {
+  console.log(screen.width)
 
-    let rowOrder = "";
+  if (screen.width > 997) {
+    for (let cocktail of jsonObject.cocktails) {
+      if (cocktail.cocktailId != 0) {
 
-    if (cocktail.cocktailId %2 == 0) {
-      rowOrder = "-reverse";
+        let rowOrder = "";
+
+        if (cocktail.cocktailId %2 == 0) {
+          rowOrder = "-reverse";
+        };
+
+        dataCocktails += `<article class="o-row o-row--lg">
+                            <div class="o-container">
+                              <div class="o-layout o-layout--gutter-lg o-layout--align-center o-layout--row${rowOrder}">
+                                <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
+                                    <figure class="c-figure">
+                                      <img src="img/cocktail_${cocktail.cocktailId}.png" alt="visual of cocktail">
+                                    </figure>
+                                </div>
+                                <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
+                                  <div class="u-max-width-sm">
+                                    <h2 class="c-lead c-lead--lg">
+                                      ${cocktail.name} - ${Math.round(cocktail.alcoholPercentage*10**4)/10**2}% vol
+                                    </h2>
+                                    <p class="u-mb-lg u-typography-secondary-base wide-screen-only">
+                                      ${cocktail.description}      
+                                    <p>
+                                    <a class="c-link-lm js-cocktail-button" href="#!" value="${cocktail.cocktailId}">
+                                      Make Cocktail
+                                    </a>
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </article>`;
+      };
     };
 
-    dataCocktails += `<article class="o-row o-row--lg">
-                    <div class="o-container">
-                        <div class="o-layout o-layout--gutter-lg o-layout--align-center o-layout--row${rowOrder}">
-                            <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
-                                <figure class="c-figure">
-                                    <img src="img/cocktail_${cocktail.cocktailId}.png" alt="visual of cocktail">
-                                </figure>
+  } else {
+    for (let cocktail of jsonObject.cocktails) {
+      let alcoholPercentage = Math.round(cocktail.alcoholPercentage*10**4)/10**2;
+      let alcoholPercentageString = `${alcoholPercentage} % vol.`
+      if (alcoholPercentage == 0) {
+        alcoholPercentageString = `?`
+      }
+
+      if (cocktail.cocktailId %2 == 0) {
+        dataCocktails += `<article class="o-row">
+                            <div class="o-container">
+                              <div class="o-layout o-layout--align-center o-layout--row">`;
+      }; 
+
+      dataCocktails += `<div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
+                          <div class="u-max-width-xl c-cocktail js-cocktail-button" value="${cocktail.cocktailId}">
+                            <img class="c-cocktail-img" src="img/cocktail${cocktail.cocktailId}.png">
+                            <div class="c-cocktail-txt c-cocktail-name">
+                              <span>${cocktail.name}</span>
                             </div>
-                            <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
-                                <div class="u-max-width-sm">
-                                    <h2 class="c-lead c-lead--lg">
-                                        ${cocktail.name} - ${Math.round(cocktail.alcoholPercentage*10**4)/10**2}% vol
-                                    </h2>
-                                    <p class="u-mb-lg u-typography-secondary-base">
-                                        ${cocktail.description}      
-                                    <p>
-                                        <a class="c-link-lm js-cocktail-button" href="#!" value="${cocktail.cocktailId}">
-                                            Try it out
-                                        </a>
-                                    </p>
-                                </div>
+                            <p class="c-cocktail-txt c-cocktail-alc">${alcoholPercentageString}</p>
+                            <div class="c-cocktail-txt c-cocktail-make">
+                              <span>Make cocktail</span>
                             </div>
+                          </div>
+                        </div>`;
+
+      if (cocktail.cocktailId %2 == 1) {
+      dataCocktails +=  `</div>
                         </div>
-                    </div>
-                </article>`
-  }
+                        </div>
+                        </div>
+                        </article>`;
+      };
+    };
   };
   htmlCocktail.innerHTML = dataCocktails;
   listenToUIMenu();

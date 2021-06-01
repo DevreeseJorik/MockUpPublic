@@ -96,7 +96,7 @@ def return_history_device(data):
 def listen_to_cocktail_request(data):
     cocktail_id = data["cocktail_id"]
 
-    if str(cocktail_id) == "random":
+    if str(cocktail_id) in ["0","random"]:
         print("\nUser chose random drink!")
         cocktail.make_random_recipe()
         return
