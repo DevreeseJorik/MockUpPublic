@@ -1,3 +1,21 @@
+// library variabelen
+
+#include <HX711_asukiaaa.h>
+
+int pinsDout[] = {A0};
+const int numPins = sizeof(pinsDout) / sizeof(pinsDout[0]);
+int pinSlk = 9;
+HX711_asukiaaa::Reader reader(pinsDout, numPins, pinSlk);
+
+#define LOAD_CELL_RATED_VOLT 0.00037f
+#define LOAD_CELL_RATED_GRAM 50000.0f
+
+#define HX711_R1 20000.0
+#define HX711_R2 8200.0
+
+HX711_asukiaaa::Parser parser(LOAD_CELL_RATED_VOLT, LOAD_CELL_RATED_GRAM, HX711_R1, HX711_R2);
+float offsetGrams[numPins];
+
 // declaratie variabelen
 
 String serialData = "Def: 0";
@@ -18,6 +36,7 @@ bool prevStateButton = 0;
 bool glassPresent = 0;
 bool finRequest = 0;
 bool waitForNewGlass = 0;
+bool systemReady = false;
 
 // declaratie pinnen
 
@@ -39,6 +58,12 @@ void setup() {
 
   pinMode(pinButton,INPUT_PULLUP);
 
+  Serial.println("Starting load cells");
+  reader.begin();
+  for (int i = 0; i < reader.doutLen; ++i) {
+    offsetGrams[i] = parser.parseToGram(reader.values[i]);
+  }
+
 }
 
 void makeCocktail(int id, float volume) {
@@ -50,6 +75,22 @@ void makeCocktail(int id, float volume) {
   digitalWrite(pinsPumps[id-1],HIGH);
 }
 
+void sendWeights() {
+  auto readState = reader.read();
+  Serial.println("ReadState: " + HX711_asukiaaa::getStrOfReadState(readState));
+  if (readState == HX711_asukiaaa::ReadState::Success) {
+    String tempText = "";
+    for (int i = 0; i < reader.doutLen; ++i) {
+      float gram = parser.parseToGram(reader.values[i]) - offsetGrams[i];
+      tempText += String(gram/1000) + ":";
+      Serial.print("Sensor" + String(i) + ": " + String(gram/1000) + " kg ");
+      Serial.println("");
+    }
+    Serial.println("");
+    Serial.println("Sen:" + tempText);
+  }
+}
+
 void loop() {
   // Serial.println("Sending Data"); // To send data 
     stateButton = digitalRead(pinButton);
@@ -57,12 +98,16 @@ void loop() {
     
     if (stateButton != prevStateButton) {
       if (stateButton == 1) {
-      Serial.println("Glass removed");
-      glassPresent = 0;
+        Serial.println("Glass removed");
+        glassPresent = 0;
       }
       if (stateButton == 0) {
-      Serial.println("New Glass put down");
-      glassPresent = 1;
+        Serial.println("New Glass put down");
+        glassPresent = 1;
+        if (systemReady == false) {
+          Serial.println("First glass put down");
+          systemReady = true;
+        }
       }
       
     }
@@ -97,6 +142,10 @@ void loop() {
       makeCocktail(id,volume);
         } 
       }
+
+      if (serialData.indexOf("Sen:") == 0) {
+        sendWeights();
+      }
     }
 
     if (finRequest == 1) {
@@ -113,6 +162,3 @@ void loop() {
     
     prevStateButton = stateButton;
 }
-
-
-     
