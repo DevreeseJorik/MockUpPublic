@@ -11,9 +11,9 @@ GPIO.setwarnings(False)
 
 
 class Cocktail:
-    def __init__(self,queue=[],waiting=False, clk=21, dt=20, sw=16,rotary_id=0):
-        self.__queue = queue
-        self.__waiting = waiting
+    def __init__(self,queue=[],waiting=True, clk=21, dt=20, sw=16,rotary_id=0):
+        self.queue = queue
+        self.waiting = waiting
 
         self.clk = clk
         self.dt = dt
@@ -23,7 +23,10 @@ class Cocktail:
         self.clk_last_state = 0
         self.rotary_id = rotary_id
 
+        self.beveragevolumes = []
+
         self.setup_pins()
+        self.get_volumes()
 
     def setup_pins(self):
         GPIO.setmode(GPIO.BCM)
@@ -33,6 +36,13 @@ class Cocktail:
         GPIO.add_event_detect(self.clk, GPIO.BOTH, self.callback_clk, bouncetime=1)
         GPIO.add_event_detect(self.sw, GPIO.FALLING, self.callback_sw, bouncetime=250)
     
+    def get_volumes(self):
+        beverages = DataRepository.get_all_beverages()
+        for beverage in beverages:
+            self.beveragevolumes.append(beverage["currentVolume"])
+        print(self.beveragevolumes)
+
+
     def callback_clk(self, pin):
         clk_state = GPIO.input(self.clk)
         dt_state = GPIO.input(self.dt)
@@ -66,28 +76,28 @@ class Cocktail:
             self.make_cocktail(recipe,self.rotary_id)
 
     def add_cocktail_to_queue(self,recipe,cocktail_id):
-        self.__queue.append([recipe,cocktail_id])
+        self.queue.append([recipe,cocktail_id])
         cocktail = DataRepository.get_cocktail_by_id(cocktail_id)
         cocktail_name = cocktail["name"]
         print(f"\nAdded {cocktail_name} to queue.")
 
     def make_next_cocktail_from_queue(self):
-        self.__waiting = False
-        if len(self.__queue) != 0:
-            print(f"\nMaking next cocktail in queue. {len(self.__queue)-1} cocktails left in queue.")
-            recipe = self.__queue[0][0]
-            cocktail_id = self.__queue[0][1]
+        self.waiting = False
+        if len(self.queue) != 0:
+            print(f"\nMaking next cocktail in queue. {len(self.queue)-1} cocktails left in queue.")
+            recipe = self.queue[0][0]
+            cocktail_id = self.queue[0][1]
             self.make_cocktail(recipe,cocktail_id)
             self.remove_first_from_queue()
             return
         print("\nQueue is now empty.")
 
     def remove_first_from_queue(self):
-        if (len(self.__queue) != 0):
-            self.__queue.pop(0)
+        if (len(self.queue) != 0):
+            self.queue.pop(0)
     
     def clear_queue(self):
-        self.__queue = []
+        self.queue = []
 
     def make_random_recipe(self):
         beverage_data = DataRepository.get_all_beverages()
@@ -101,7 +111,7 @@ class Cocktail:
 
     def make_cocktail(self,recipe,cocktail_id):
         # print(recipe)
-        if self.__waiting == True:
+        if self.waiting == True:
             self.add_cocktail_to_queue(recipe,cocktail_id)
             return
 
@@ -121,6 +131,6 @@ class Cocktail:
             DataRepository.put_device_history(device_id=beverage_id+1,action_id=1,value=volume,comment=str(cocktail_name))
         
         SerialRepository.send_ser("Act:Fin")
-        self.__waiting = True
+        self.waiting = True
         DataRepository.put_cocktail_history(cocktail_id,str(cocktail_name))
  

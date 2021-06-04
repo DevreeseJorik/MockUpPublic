@@ -49,12 +49,24 @@ def slow_loop():
 def fast_loop():
         while True:
             line = SerialRepository.get_ser()
+            if line == "First glass put down":
+                cocktail.waiting = False
+                cocktail.make_next_cocktail_from_queue()
+
             if "Val" in line:
                 print(f"\nReceiving Serial:\n{line}")
 
             if line == "Finished cocktailprocess":
                 print(f"Drink has been completed")
                 cocktail.make_next_cocktail_from_queue()
+                SerialRepository.send_ser("Sen:All")
+
+            if "Ser:" in line:
+                values = line[4:].split(":")
+                for i in len(values):
+                    print(values[i])
+            
+                
 
 thread = threading.Timer(10, slow_loop)
 thread.start()
