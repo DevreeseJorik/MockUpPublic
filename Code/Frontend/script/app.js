@@ -117,7 +117,7 @@ const showCocktailPopularity = function(jsonObject) {
     convertedData.push(element.count);
   };
 
-  drawBarChart(convertedCategories,convertedData,'.js-chart-cocktail-popularity',"Cocktail Popularity");
+  drawBarChart(convertedCategories,convertedData,'.js-chart-cocktail-popularity',"Cocktail Popularity","");
 }
 
 const showHistorySensors = function(jsonObject) {
@@ -125,32 +125,156 @@ const showHistorySensors = function(jsonObject) {
   let convertedCategoriesTemp= [];
   let convertedDataTemp  = [];
 
-  let convertedCategoriesWeight= [];
-  let convertedDataWeight  = [];
+  let convertedCategoriesVolume= [];
+  let convertedDataVolume  = [];
 
   if (jsonObject.length != 0) {
     for (const element of jsonObject.temperature) {
       convertedCategoriesTemp.push(element.time);
       convertedDataTemp.push(element.value);
     };
-    drawLineChart(convertedCategoriesTemp,convertedDataTemp,'.js-chart-temperature','Time','Temperature','Temperature measurements');
-    for (const element of jsonObject.weights) {
-      convertedCategoriesWeight.push(`Drink ${element.deviceId}`);
-      convertedDataWeight.push(element.value);
+    drawLineChart(convertedCategoriesTemp,convertedDataTemp,'.js-chart-temperature','Time','Temperature','Temperature measurements',10,36);
+    for (const element of jsonObject.volume) {
+      convertedCategoriesVolume.push(`Drink ${element.deviceId}`);
+      convertedDataVolume.push(element.value);
     };
-    drawBarChart(convertedCategoriesWeight,convertedDataWeight,'.js-chart-weights','Weight measurements');
+    drawBarChart(convertedCategoriesVolume,convertedDataVolume,'.js-chart-volumes','Volume measurements');
   };
 }
 
-const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNameY,chartName) {
-  console.log(chartName)
+const showHistoryCocktail = function(jsonObject) {
+  console.log(jsonObject)
+  let convertedCategories= [];
+  let convertedData  = [];
+
+  if (jsonObject.length != 0) {
+    for (const element of jsonObject) {
+      convertedCategories.push(element.date);
+      convertedData.push(element.historyId);
+    };
+
+    drawLineChart(convertedCategories,convertedData,'.js-chart-cocktail-history','Time','Cocktails','Cocktails History');
+
+  };
+};
+
+const showHistoryActuator = function(jsonObject) {
+  // console.log(jsonObject)
+
+  let convertedCategories= [];
+  let convertedData  = {0:[],1:[],2:[],3:[],4:[],5:[]};
+
+  if (jsonObject.length != 0) {
+    for (const element of jsonObject) {
+      // console.log(element);
+      // console.log(element.date);
+      // console.log(element.value);
+      id = element.deviceId-2;
+      convertedCategories.push(element.time);
+      convertedData[id].push(element.value);
+      for (let i = 0; i < 6; i++) {
+        if (i != id) {
+          convertedData[i].push(0);
+        };
+      };
+    };
+    
+    // console.log(convertedCategories);
+    // console.log(convertedData);
+
+    let series = []
+    for (let i = 0; i < 6; i++) {
+      series.push({name:`Pump ${i+1}`,data:convertedData[i]})
+      
+      // for (const element of convertedCategories) {
+        
+      // }
+
+    }
+
+    drawLineChart2(convertedCategories,series,'.js-chart-pump-history','Time','Pumps','Pump Usage History');
+
+  };
+};
+
+
+
+const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNameY,chartName,min,max) {
   var options = {
-    series: [
-    {
-      name: chartName,
-      data: data
+    series: [{
+    name: chartName,
+    data: data
+  }],
+    chart: {
+    type: 'area',
+    stacked: false,
+    height: 350,
+    zoom: {
+      type: 'x',
+      enabled: true,
+      autoScaleYaxis: true
     },
-  ],
+    toolbar: {
+      autoSelected: 'zoom'
+    }
+  },
+  dataLabels: {
+    enabled: false
+  },
+  markers: {
+    size: 0,
+  },
+  title: {
+    text: chartNameY,
+    align: 'left'
+  },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      inverseColors: false,
+      opacityFrom: 0.5,
+      opacityTo: 0,
+      stops: [0, 90, 100]
+    },
+  },
+  yaxis: {
+    title: {
+      text: chartNameY
+    },
+    min: min,
+    max: max
+  },
+  xaxis: {
+    categories: categories,
+    title: {
+      text: chartNameX
+    }
+  },
+  tooltip: {
+    shared: false,
+    y: {
+      formatter: function (val) {
+        return (val / 1000000).toFixed(0)
+      }
+    }
+  },
+  colors: ['#748C00'],
+  };
+
+  var chart = new ApexCharts(document.querySelector(chartSelector), options);
+  chart.render();
+}
+
+
+
+const drawLineChart2 = function(categories,data,chartSelector,chartNameX,chartNameY,chartName,min,max,sign="ml") {
+  console.log(data)
+  console.log(categories)
+  console.log(chartName)
+
+  var options = {
+    series: data,
     chart: {
     height: 350,
     type: 'line',
@@ -166,7 +290,7 @@ const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNam
       show: false
     }
   },
-  colors: ['#748C00'],
+  colors: ['#748C00','#008C79','#00178C','#67008C','#8C0000','#C5C51F'],
   dataLabels: {
     enabled: true,
   },
@@ -184,6 +308,12 @@ const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNam
       opacity: 0.5
     },
   },
+  dataLabels: {
+    enabled: true,
+    formatter: function (val) {
+      return val + sign; 
+    }
+  },
   markers: {
     size: 1
   },
@@ -197,8 +327,8 @@ const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNam
     title: {
       text: chartNameY
     },
-    min: 5,
-    max: 40
+    min: 0,
+    max: 250
   },
   legend: {
     position: 'top',
@@ -214,7 +344,7 @@ const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNam
 }
 
 
-const drawBarChart = function(categories,data,chartSelector,chartName) {
+const drawBarChart = function(categories,data,chartSelector,chartName,sign) {
   // console.log(chartName)
   var options = {
     series: [{
@@ -237,7 +367,7 @@ const drawBarChart = function(categories,data,chartSelector,chartName) {
   dataLabels: {
     enabled: true,
     formatter: function (val) {
-      return val + "%"; 
+      return val + sign; 
     },
     offsetY: -20,
     style: {
@@ -281,7 +411,7 @@ const drawBarChart = function(categories,data,chartSelector,chartName) {
     labels: {
       show: false,
       formatter: function (val) {
-        return val + "%";
+        return val + sign;
       }
     }
   
@@ -342,13 +472,13 @@ const listenToSocketMenu = function() {
 
 const listenToSocketStat = function() {
   socket.on("B2F_current_temperature", function (temperature) {
-    // console.log("Received current temperature");
+    console.log("Received current temperature");
     // console.log(jsonObject);
     showCurrentTemperature(temperature);
   });
 
   socket.on("B2F_cocktail_popularity", function (jsonObject) {
-    // console.log("Received cocktail popularity");
+    console.log("Received cocktail popularity");
     // console.log(jsonObject);
     showCocktailPopularity(jsonObject);    
   });
@@ -362,9 +492,9 @@ const listenToSocketStat = function() {
 
 
   //   socket.on("B2F_cocktail_history", function (jsonObject) {
-  //     // console.log("Received latest history");
+  //     console.log("Received cocktail history");
   //     // console.log(jsonObject);
-  //     showCocktailHistory(jsonObject);    
+  //     showHistoryCocktail(jsonObject);    
   // });
 
   // socket.on("B2F_current_volume", function (jsonObject) {
@@ -373,13 +503,10 @@ const listenToSocketStat = function() {
   //   showCurrentVolume(jsonObject);
   // });
 
-
-
-  // socket.on("B2F_actuator_history", function (jsonObject) {
-  //   console.log("Received Analytics list");
-  //   addAnalytics();
-  //   showActuatorHistory(jsonObject);
-  // });
+  socket.on("B2F_actuator_history", function (jsonObject) {
+    console.log("Received actuator list");
+    showHistoryActuator(jsonObject);
+  });
 };
 
 document.addEventListener("DOMContentLoaded", function () {

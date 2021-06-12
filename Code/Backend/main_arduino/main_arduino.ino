@@ -82,8 +82,8 @@ void sendWeights() {
     String tempText = "";
     for (int i = 0; i < reader.doutLen; ++i) {
       float gram = parser.parseToGram(reader.values[i]) - offsetGrams[i];
-      tempText += String(gram/1000) + ":";
-      Serial.print("Sensor" + String(i) + ": " + String(gram/1000) + " kg ");
+      tempText += String(i) + ":" + String(gram/1000);
+      Serial.print("Sensor:" + String(i) + ": " + String(gram/1000));
       Serial.println("");
     }
     Serial.println("");
@@ -118,12 +118,13 @@ void loop() {
       serialData = Serial.readStringUntil('\n'); // receiving data
       // Serial.print("Arduino Acknowledges receiving following data: ");
       //Serial.println(serialData);
+      /*
       if (serialData.indexOf("Sen:") == 0) {
         val = serialData[4];
         id = val.toInt();
         value = 1023;
         Serial.println("Sen:"+ String(id) + "/Val:" + String(value));
-      }
+      }*/
 
       if (serialData.indexOf("Act:") == 0) {
         if (serialData == "Act:Start") {

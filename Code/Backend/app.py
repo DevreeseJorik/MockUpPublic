@@ -63,10 +63,12 @@ def fast_loop():
                 cocktail.make_next_cocktail_from_queue()
                 SerialRepository.send_ser("Sen:All")
 
-            if "Sen:" in line:
-                values = line[4:].split(":")
-                for i in values:
-                    print(values)
+            if "Sensor" in line:
+                split_line = line.split(":")
+                print(split_line)
+                id = split_line[1]   # add 6 when sending to database, first 6 are other devices
+                value = split_line[2] + cocktail.beveragevolumes[id]
+                DataRepository.put_device_history(id+6,action_id=None,value=value,comment=None)
             
                 
 
@@ -114,13 +116,12 @@ def return_main_data(data):
         count_cocktails = DataRepository.get_cocktail_count()
         emit('B2F_cocktail_popularity',count_cocktails)
 
-        sensor_history = DataRepository.get_latest_rows_sensor_history(15,'1')
-        emit('B2F_sensor_history',sensor_history)
+        temperature_history = DataRepository.get_latest_rows_sensor_history(15,'1')
 
-        sensor_history = DataRepository.get_latest_rows_sensor_history(15,'2,3,4,5,6,7')
-        emit('B2F_sensor_history',sensor_history)
+        volume_history = DataRepository.get_latest_rows_sensor_history(15,'2,3,4,5,6,7')
+        emit('B2F_sensor_history',{'temperature':temperature_history,'volume':volume_history})
 
-        actuator_history = DataRepository.get_latest_rows_actuator_history()
+        actuator_history = DataRepository.get_latest_rows_actuator_history(20)
         emit('B2F_actuator_history', actuator_history)
         
 

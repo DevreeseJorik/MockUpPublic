@@ -138,7 +138,7 @@ class DataRepository:
 
     @staticmethod
     def get_latest_rows_actuator_history(limit=1000):
-        sql = 'select h.deviceId,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "actuator" order by date desc limit %s'
+        sql = 'select h.deviceId,d.name,date_format(date,"%d/%m/%y") as date, date_format(date,"%h:%m") as time,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "actuator" order by date desc limit %s'
         params = [limit]
         return Database.get_rows(sql,params)
 

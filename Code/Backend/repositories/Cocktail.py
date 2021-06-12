@@ -84,6 +84,7 @@ class Cocktail:
             print(f"Received request to make cocktail: {self.rotary_id}")
             recipe = DataRepository.get_recipe_by_cocktail_id(self.rotary_id)
             self.make_cocktail(recipe,self.rotary_id)
+            DataRepository.put_device_history(14,action_id=2)
 
     def add_cocktail_to_queue(self,recipe,cocktail_id):
         self.queue.append([recipe,cocktail_id])
