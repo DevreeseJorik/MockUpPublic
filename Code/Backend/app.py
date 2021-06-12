@@ -57,14 +57,16 @@ def fast_loop():
                 print(f"\nReceiving Serial:\n{line}")
 
             if line == "Finished cocktailprocess":
+                print("Cocktailprocess finished")
+                cocktail.waiting = False
                 print(f"Drink has been completed")
                 cocktail.make_next_cocktail_from_queue()
                 SerialRepository.send_ser("Sen:All")
 
-            if "Ser:" in line:
+            if "Sen:" in line:
                 values = line[4:].split(":")
-                for i in len(values):
-                    print(values[i])
+                for i in values:
+                    print(values)
             
                 
 
@@ -89,14 +91,42 @@ def initial_connection():
 
 @socketio.on("F2B_request_data")
 def return_main_data(data):
-    print(data["url"])
+    # print(data["url"])
+
     if data["url"] == "Menu.html":
         cocktails = DataRepository.read_all_cocktails()
-        emit('B2F_cocktails', {'cocktails': cocktails})
+        emit('B2F_cocktail_menu', {'cocktails': cocktails})
+        print("Cocktail data sent")
+
     if data["url"] == "Stats.html":
-        # print(data["limit"])
-        data = DataRepository.get_latest_rows_device_history(data["limit"])
-        emit('B2F_history_device', {'history': data})
+        temperature = DataRepository.get_latest_rows_device_history(1,'1')
+        emit('B2F_current_temperature',round(temperature[0]['value'],2))
+
+        pumps_volume = DataRepository.get_all_beverages()
+        emit('B2F_current_volume', pumps_volume)
+
+        latest_cocktail = DataRepository.get_latest_created_cocktails(1)
+        emit('B2F_latest_cocktail',latest_cocktail)
+
+        cocktail_history = DataRepository.get_cocktail_history()
+        emit('B2F_cocktail_history',cocktail_history)
+
+        count_cocktails = DataRepository.get_cocktail_count()
+        emit('B2F_cocktail_popularity',count_cocktails)
+
+        sensor_history = DataRepository.get_latest_rows_sensor_history(15,'1')
+        emit('B2F_sensor_history',sensor_history)
+
+        sensor_history = DataRepository.get_latest_rows_sensor_history(15,'2,3,4,5,6,7')
+        emit('B2F_sensor_history',sensor_history)
+
+        actuator_history = DataRepository.get_latest_rows_actuator_history()
+        emit('B2F_actuator_history', actuator_history)
+        
+
+
+
+
 
 @socketio.on("F2B_history_device")
 def return_history_device(data):

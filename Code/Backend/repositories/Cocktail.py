@@ -24,6 +24,7 @@ class Cocktail:
         self.rotary_id = rotary_id
 
         self.beveragevolumes = []
+        self.extra_screens = 1
 
         self.setup_pins()
         self.get_volumes()
@@ -46,22 +47,31 @@ class Cocktail:
     def callback_clk(self, pin):
         clk_state = GPIO.input(self.clk)
         dt_state = GPIO.input(self.dt)
+
+        max_cocktails = DataRepository.get_total_cocktails()["count"]
+
         if clk_state != self.clk_last_state and clk_state == False:
             if dt_state != clk_state:
-                self.counter -= 1
-                if self.counter < -1:
-                    max_cocktails = DataRepository.get_total_cocktails()["count"]
-                    self.rotary_id = (self.rotary_id  - 1) % max_cocktails
-                    if self.rotary_id < 0:
-                        self.rotary_id = max_cocktails - 1
-                    display.display_drink_with_row_number(self.rotary_id)
+                # self.counter -= 1
+                # if self.counter < -1:
+                # self.counter = 0
+                print("Turning left")
+                self.rotary_id = (self.rotary_id  - 1)
+                if self.rotary_id < 0:
+                    self.rotary_id = max_cocktails + self.extra_screens - 1
+ 
             else:
-                self.counter += 1
-                if self.counter > 1:
-                    self.counter = 0
-                    max_cocktails = DataRepository.get_total_cocktails()["count"]
-                    self.rotary_id = (self.rotary_id  + 1) % max_cocktails
-                    display.display_drink_with_row_number(self.rotary_id)
+                # self.counter += 1
+                # if self.counter > 1:
+                # self.counter = 0
+                print("Turning right")
+                self.rotary_id = (self.rotary_id  + 1) % (max_cocktails + self.extra_screens)
+
+
+            if self.rotary_id < max_cocktails:
+                display.display_drink_with_row_number(self.rotary_id)
+            else:
+                display.display_extra_screen(self.rotary_id-max_cocktails)
         self.clk_last_state = clk_state
             
     def callback_sw(self, pin):

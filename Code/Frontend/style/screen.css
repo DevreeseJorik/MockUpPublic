@@ -144,7 +144,7 @@ hr {
 }
 
 a {
-  color: #1195F7;
+  color: #FFFFFF;
   transition: all .1s ease-in-out;
 }
 
@@ -373,14 +373,6 @@ a:focus {
   list-style: none;
   padding: 0;
 }
-
-/*------------------------------------*\
-#COMPONENTS
-\*------------------------------------*/
-
-
-
-
 
 /*------------------------------------*\
 #COMPONENTS
@@ -739,7 +731,6 @@ a:focus {
   
  }
  
-
 .c-cocktail-img {
     border-radius: 30px;
 }
@@ -767,6 +758,19 @@ a:focus {
 
 .c-cocktail-make {
   bottom:130px;
+}
+
+/*
+  Component: Chart
+  ---
+  Charts used to show data
+*/
+
+.c-chart {
+  width: 60%;
+  margin-top:32px;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 

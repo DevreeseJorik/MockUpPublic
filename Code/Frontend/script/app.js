@@ -99,58 +99,214 @@ const addCocktails = function (jsonObject) {
   listenToUIMenu();
 }
 
-const addAnalytics = function() {
-  let htmlAnalytics = document.querySelector(".analytics_section");
-  console.log(htmlAnalytics);
-  console.log("What")
-
-  const ctx = document.getElementById('myChart').getContext('2d');
-  const myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-          datasets: [{
-              label: '# of Votes',
-              data: [12, 19, 3, 5, 2, 3],
-              backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(255, 206, 86, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(153, 102, 255, 0.2)',
-                  'rgba(255, 159, 64, 0.2)'
-              ],
-              borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 1
-          }]
-      },
-      options: {
-          scales: {
-              y: {
-                  beginAtZero: true
-              }
-          }
-      }
-  });
+const showCurrentTemperature = function(temperature) {
+  let htmlDevice = document.querySelector(".js-temperature")
+  console.log(temperature)
+  htmlDevice.innerHTML = `Temperature: ${temperature}°C`
+  socket.emit('F2B_current_temperature',{'limit':1});
 }
 
-const addDeviceData = function(jsonObject) {
-  let htmlDevice = document.querySelector(".analytics_section")
-  htmlDevice.innerHTML = ""
-  for (let device of jsonObject.history) {
-    htmlDevice.innerHTML += `Name: ${device.name}\nValue: ${device.value}\nDescription: ${device.description}`
+
+const showCocktailPopularity = function(jsonObject) {
+  // console.log(jsonObject);
+  let convertedCategories= [];
+  let convertedData = [];
+  for (const element of jsonObject) {
+    // console.log(element);
+    convertedCategories.push(element.name);
+    convertedData.push(element.count);
+  };
+
+  drawBarChart(convertedCategories,convertedData,'.js-chart-cocktail-popularity',"Cocktail Popularity");
+}
+
+const showHistorySensors = function(jsonObject) {
+  console.log(jsonObject)
+  let convertedCategoriesTemp= [];
+  let convertedDataTemp  = [];
+
+  let convertedCategoriesWeight= [];
+  let convertedDataWeight  = [];
+
+  if (jsonObject.length != 0) {
+    for (const element of jsonObject.temperature) {
+      convertedCategoriesTemp.push(element.time);
+      convertedDataTemp.push(element.value);
+    };
+    drawLineChart(convertedCategoriesTemp,convertedDataTemp,'.js-chart-temperature','Time','Temperature','Temperature measurements');
+    for (const element of jsonObject.weights) {
+      convertedCategoriesWeight.push(`Drink ${element.deviceId}`);
+      convertedDataWeight.push(element.value);
+    };
+    drawBarChart(convertedCategoriesWeight,convertedDataWeight,'.js-chart-weights','Weight measurements');
+  };
+}
+
+const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNameY,chartName) {
+  console.log(chartName)
+  var options = {
+    series: [
+    {
+      name: chartName,
+      data: data
+    },
+  ],
+    chart: {
+    height: 350,
+    type: 'line',
+    dropShadow: {
+      enabled: true,
+      color: '#000',
+      top: 18,
+      left: 7,
+      blur: 10,
+      opacity: 0.2
+    },
+    toolbar: {
+      show: false
+    }
+  },
+  colors: ['#748C00'],
+  dataLabels: {
+    enabled: true,
+  },
+  stroke: {
+    curve: 'smooth'
+  },
+  title: {
+    text: chartName,
+    align: 'center'
+  },
+  grid: {
+    borderColor: '#e7e7e7',
+    row: {
+      colors: ['#f3f3f3', 'transparent'],
+      opacity: 0.5
+    },
+  },
+  markers: {
+    size: 1
+  },
+  xaxis: {
+    categories: categories,
+    title: {
+      text: chartNameX
+    }
+  },
+  yaxis: {
+    title: {
+      text: chartNameY
+    },
+    min: 5,
+    max: 40
+  },
+  legend: {
+    position: 'top',
+    horizontalAlign: 'right',
+    floating: true,
+    offsetY: -25,
+    offsetX: -5
   }
-  socket.emit('F2B_history_device',{'limit':1});
+  };
 
+  var chart = new ApexCharts(document.querySelector(chartSelector), options);
+  chart.render();
 }
 
+
+const drawBarChart = function(categories,data,chartSelector,chartName) {
+  // console.log(chartName)
+  var options = {
+    series: [{
+    name: chartName,
+    data: data
+  }],
+    chart: {
+    height: 350,
+    type: 'bar',
+    fill: '#000'
+  },
+  plotOptions: {
+    bar: {
+      borderRadius: 10,
+      dataLabels: {
+        position: 'top', // top, center, bottom
+      },
+    }
+  },
+  dataLabels: {
+    enabled: true,
+    formatter: function (val) {
+      return val + "%"; 
+    },
+    offsetY: -20,
+    style: {
+      fontSize: '12px',
+      colors: ["black"]
+    }
+  },
+  
+  xaxis: {
+    categories: categories,
+    position: 'bottom',
+    axisBorder: {
+      show: false
+    },
+    axisTicks: {
+      show: false
+    },
+    crosshairs: {
+      fill: {
+        type: 'gradient',
+        gradient: {
+          colorFrom: '#E6F3A3',
+          colorTo: '#748C00',
+          stops: [0, 100],
+          opacityFrom: 0.4,
+          opacityTo: 0.5,
+        }
+      }
+    },
+    tooltip: {
+      enabled: true,
+    }
+  },
+  yaxis: {
+    axisBorder: {
+      show: false
+    },
+    axisTicks: {
+      show: false,
+    },
+    labels: {
+      show: false,
+      formatter: function (val) {
+        return val + "%";
+      }
+    }
+  
+  },
+  title: {
+    text: chartName,
+    floating: true,
+    offsetY: 0,
+    align: 'center',
+    style: {
+      color: '#444'
+    }
+  } ,
+  fill: {
+    colors: ['#748C00']
+  }
+  };
+
+  chart = new ApexCharts(document.querySelector(chartSelector),options)
+  chart.render()
+}
+
+
+
+// Socket listening
 
 const listenToSocket = function () {
   socket.on("connected", function () {
@@ -161,22 +317,23 @@ const listenToSocket = function () {
   // console.log(url);  
   if ((url[1] == "Menu.html") | (url[4] == "Menu.html")) {
     console.log("Welcome to the Menu Page.");
-    socket.emit('F2B_request_data',{'url':"Menu.html"});
-    listenToSocketMenu();
+    page = "Menu.html"
     
   } 
   
   if ((url[1] == "Stats.html") | (url[4] == "Stats.html")) {
     console.log("Welcome to the Analytics Page");
-    socket.emit('F2B_request_data',{'url':"Stats.html","limit":1});
-    listenToSocketStat();
+    page = "Stats.html"
   }
 
-
+  socket.emit('F2B_request_data',{'url':page});
+  listenToSocketMenu();
+  listenToSocketStat();
 };
 
+
 const listenToSocketMenu = function() {
-  socket.on("B2F_cocktails", function (jsonObject) {
+  socket.on("B2F_cocktail_menu", function (jsonObject) {
     console.log("Received cocktail list");
     console.log(jsonObject);
     addCocktails(jsonObject);
@@ -184,21 +341,46 @@ const listenToSocketMenu = function() {
 };
 
 const listenToSocketStat = function() {
-  socket.on("B2F_analytics", function (jsonObject) {
-    console.log("Received Analytics list");
+  socket.on("B2F_current_temperature", function (temperature) {
+    // console.log("Received current temperature");
     // console.log(jsonObject);
-    addAnalytics();
-    addDeviceData(jsonObject);
+    showCurrentTemperature(temperature);
   });
 
-  socket.on("B2F_history_device", function (jsonObject) {
-    // console.log("Received latest history");
+  socket.on("B2F_cocktail_popularity", function (jsonObject) {
+    // console.log("Received cocktail popularity");
     // console.log(jsonObject);
-    addDeviceData(jsonObject);
+    showCocktailPopularity(jsonObject);    
   });
+
+
+  socket.on("B2F_sensor_history", function (jsonObject) {
+    console.log("Received sensor history")
+    // console.log(jsonObject);
+    showHistorySensors(jsonObject);
+  });
+
+
+  //   socket.on("B2F_cocktail_history", function (jsonObject) {
+  //     // console.log("Received latest history");
+  //     // console.log(jsonObject);
+  //     showCocktailHistory(jsonObject);    
+  // });
+
+  // socket.on("B2F_current_volume", function (jsonObject) {
+  //   // console.log("Received latest history");
+  //   // console.log(jsonObject);
+  //   showCurrentVolume(jsonObject);
+  // });
+
+
+
+  // socket.on("B2F_actuator_history", function (jsonObject) {
+  //   console.log("Received Analytics list");
+  //   addAnalytics();
+  //   showActuatorHistory(jsonObject);
+  // });
 };
-
-
 
 document.addEventListener("DOMContentLoaded", function () {
   console.info("DOM geladen");
