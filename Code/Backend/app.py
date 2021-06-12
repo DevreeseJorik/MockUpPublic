@@ -8,11 +8,9 @@ from flask import Flask, jsonify
 
 from repositories.DataRepository import DataRepository
 from repositories.Cocktail import Cocktail
-# from repositories.Rotary import Rotary
 from repositories.OneWire import OneWire
 from repositories.SerialRepository import SerialRepository
 # from repositories.LCDdisplay import Display
-# from helpers.klasseknop import Button
 
 GPIO.setwarnings(False)
 
@@ -20,7 +18,7 @@ one_wire = OneWire()
 # display = Display()
 cocktail = Cocktail()
 
-# Code voor Hardware
+# Code for Hardware
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
@@ -42,8 +40,8 @@ def error_handler(e):
 def slow_loop():
         while True:
             temp_val = one_wire.read_temp()
-            # DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
-            # SerialRepository.send_ser("Sen:1")
+            DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
+            emit('B2F_current_temperature',round(temp_val,2))
             time.sleep(10)
 
 def fast_loop():
@@ -123,11 +121,6 @@ def return_main_data(data):
 
         actuator_history = DataRepository.get_latest_rows_actuator_history(20)
         emit('B2F_actuator_history', actuator_history)
-        
-
-
-
-
 
 @socketio.on("F2B_history_device")
 def return_history_device(data):
