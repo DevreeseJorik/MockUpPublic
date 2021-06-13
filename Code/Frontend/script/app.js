@@ -512,4 +512,5 @@ const listenToSocketStat = function() {
 document.addEventListener("DOMContentLoaded", function () {
   console.info("DOM geladen");
   listenToSocket();
+  document.querySelector(".js-shutdown").addEventListener('click',function() {socket.emit("F2B_shutdown")});
 });

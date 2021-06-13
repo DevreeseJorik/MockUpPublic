@@ -10,6 +10,7 @@ from repositories.DataRepository import DataRepository
 from repositories.Cocktail import Cocktail
 from repositories.OneWire import OneWire
 from repositories.SerialRepository import SerialRepository
+from subprocess import call
 # from repositories.LCDdisplay import Display
 
 GPIO.setwarnings(False)
@@ -140,6 +141,12 @@ def listen_to_cocktail_request(data):
     # print(f"Received request to make cocktail: {cocktail_id}")
     recipe = DataRepository.get_recipe_by_cocktail_id(cocktail_id)
     cocktail.make_cocktail(recipe,cocktail_id)
+
+@socketio.on('F2B_shutdown')
+def shutdown_pi():
+    print("shutdown initiliased")
+    call(" echo 'W8w00rd' | sudo -S sudo shutdown -h now", shell=True)
+
 
 # Other functions (redundant: moved to own repositories)
 
