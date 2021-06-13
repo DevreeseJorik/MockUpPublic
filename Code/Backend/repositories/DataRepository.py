@@ -144,7 +144,7 @@ class DataRepository:
 
     @staticmethod
     def get_latest_created_cocktails(limit):
-        sql = 'SELECT historyId,date_format(actiondate,"%d/%m/%y") as date, date_format(actiondate,"%h:%m:%s") as time, cocktailId FROM cocktailhistory order by actionDate desc limit %s'
+        sql = 'select ch.historyId,c.name,date_format(ch.actiondate,"%d/%m/%y") as date, date_format(ch.actiondate,"%h:%m:%s") as time, ch.cocktailId FROM cocktailhistory ch join cocktail c on ch.cocktailId = c.cocktailId order by ch.actionDate desc limit %s'
         params = ["%s",limit]
         return Database.get_rows(sql,params)
 

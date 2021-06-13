@@ -25,37 +25,79 @@ const addCocktails = function (jsonObject) {
     for (let cocktail of jsonObject.cocktails) {
       if (cocktail.cocktailId != 0) {
 
-        let rowOrder = "";
+        // let rowOrder = "";
 
-        if (cocktail.cocktailId %2 == 0) {
-          rowOrder = "-reverse";
-        };
+        // if (cocktail.cocktailId %2 == 0) {
+        //   rowOrder = "-reverse";
+        // };
 
+        // dataCocktails += `<article class="o-row o-row--lg">
+        //                     <div class="o-container">
+        //                       <div class="o-layout o-layout--gutter-lg o-layout--align-center o-layout--row${rowOrder}">
+        //                         <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
+        //                             <figure class="c-figure">
+        //                               <img class="c-cocktail-image c-cocktail-img" src="img/cocktail${cocktail.cocktailId}.png" alt="visual of cocktail">
+        //                             </figure>
+        //                         </div>
+        //                         <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
+        //                           <div class="u-max-width-sm">
+        //                             <h2 class="c-lead c-lead--lg">
+        //                               ${cocktail.name} - ${Math.round(cocktail.alcoholPercentage*10**4)/10**2}% vol
+        //                             </h2>
+        //                             <p class="u-mb-lg u-typography-secondary-base wide-screen-only">
+        //                               ${cocktail.description}      
+        //                             <p>
+        //                             <a class="c-link js-cocktail-button" href="#!" value="${cocktail.cocktailId}">
+        //                               Make Cocktail
+        //                             </a>
+        //                             </p>
+                                    
+        //                           </div>
+        //                         </div>
+        //                       </div>
+        //                     </div>
+        //                   </article>`;
+
+        if (cocktail.cocktailId %2 == 1) {
+          dataCocktails += `<article class="o-row">
+                              <div class="o-container">
+                                <div class="o-layout o-layout--align-center o-layout--row">`;
+        }; 
+  
         dataCocktails += `<article class="o-row o-row--lg">
                             <div class="o-container">
-                              <div class="o-layout o-layout--gutter-lg o-layout--align-center o-layout--row${rowOrder}">
+                              <div class="o-layout o-layout--gutter o-layout--align-center o-layout--row">
                                 <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
-                                    <figure class="c-figure">
-                                      <img src="img/cocktail_${cocktail.cocktailId}.png" alt="visual of cocktail">
-                                    </figure>
+                                      <img class="c-cocktail-image c-cocktail-img" src="img/cocktail${cocktail.cocktailId}.png" alt="visual of cocktail">
                                 </div>
                                 <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
                                   <div class="u-max-width-sm">
                                     <h2 class="c-lead c-lead--lg">
                                       ${cocktail.name} - ${Math.round(cocktail.alcoholPercentage*10**4)/10**2}% vol
                                     </h2>
-                                    <p class="u-mb-lg u-typography-secondary-base wide-screen-only">
+                                    <p class="u-mb-lg u-typography-secondary-base">
                                       ${cocktail.description}      
                                     <p>
-                                    <a class="c-link-lm js-cocktail-button" href="#!" value="${cocktail.cocktailId}">
+                                    <a class="c-link js-cocktail-button" href="#!" value="${cocktail.cocktailId}">
                                       Make Cocktail
                                     </a>
                                     </p>
+                                    
                                   </div>
                                 </div>
                               </div>
                             </div>
                           </article>`;
+  
+        if (cocktail.cocktailId %2 == 0) {
+        dataCocktails +=  `</div>
+                          </div>
+                          </div>
+                          </div>
+                          </article>`;
+        };
+
+
       };
     };
 
@@ -101,13 +143,24 @@ const addCocktails = function (jsonObject) {
 
 const showCurrentTemperature = function(temperature) {
   let htmlDevice = document.querySelector(".js-temperature")
-  console.log(temperature)
+  // console.log(temperature)
   htmlDevice.innerHTML = `Temperature: ${temperature}°C`
-  socket.emit('F2B_current_temperature',{'limit':1});
+}
+
+const showLatestCocktail = function(cocktail) {
+  let htmlDevice = document.querySelector(".js-cocktail")
+  console.log(cocktail)
+  htmlDevice.innerHTML = `Last cocktail: ${cocktail[0].name}`
 }
 
 
 const showCocktailPopularity = function(jsonObject) {
+
+  let cocktailPopularitySelector = '.js-chart-cocktail-popularity-big'
+
+  if (screen.width < 998) {
+    cocktailPopularitySelector = '.js-chart-cocktail-popularity-small'
+  }
   // console.log(jsonObject);
   let convertedCategories= [];
   let convertedData = [];
@@ -117,7 +170,7 @@ const showCocktailPopularity = function(jsonObject) {
     convertedData.push(element.count);
   };
 
-  drawBarChart(convertedCategories,convertedData,'.js-chart-cocktail-popularity',"Cocktail Popularity","");
+  drawBarChart(convertedCategories,convertedData,cocktailPopularitySelector,"Cocktail Popularity","");
 }
 
 const showHistorySensors = function(jsonObject) {
@@ -354,7 +407,8 @@ const drawBarChart = function(categories,data,chartSelector,chartName,sign) {
     chart: {
     height: 350,
     type: 'bar',
-    fill: '#000'
+    fill: '#000',
+    background: '#fff'
   },
   plotOptions: {
     bar: {
@@ -477,12 +531,16 @@ const listenToSocketStat = function() {
     showCurrentTemperature(temperature);
   });
 
+  socket.on("B2F_latest_cocktail", function (jsonObject) {
+    console.log("Received actuator list");
+    showLatestCocktail(jsonObject);
+  });
+
   socket.on("B2F_cocktail_popularity", function (jsonObject) {
     console.log("Received cocktail popularity");
     // console.log(jsonObject);
     showCocktailPopularity(jsonObject);    
   });
-
 
   socket.on("B2F_sensor_history", function (jsonObject) {
     console.log("Received sensor history")
@@ -491,17 +549,6 @@ const listenToSocketStat = function() {
   });
 
 
-  //   socket.on("B2F_cocktail_history", function (jsonObject) {
-  //     console.log("Received cocktail history");
-  //     // console.log(jsonObject);
-  //     showHistoryCocktail(jsonObject);    
-  // });
-
-  // socket.on("B2F_current_volume", function (jsonObject) {
-  //   // console.log("Received latest history");
-  //   // console.log(jsonObject);
-  //   showCurrentVolume(jsonObject);
-  // });
 
   socket.on("B2F_actuator_history", function (jsonObject) {
     console.log("Received actuator list");

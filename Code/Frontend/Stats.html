@@ -107,26 +107,27 @@
                     <nav class="c-nav">
                         <ul class="o-list c-nav__list">
                             <li class="c-nav__item"><a href="Menu.html" class="c-nav__link">Cocktail Menu</a></li>
-                            <li class="c-nav__item"><a href="#!" class="c-nav__link">Analytics Tool</a></li>
+                            <li class="c-nav__item"><a href="#!" class="c-nav__link c-current">Analytics Tool</a></li>
                         </ul>
                     </nav>
                 </div>
-                <div class="c-header__nav">
+                <div class="c-header__nav ">
                     <nav class="c-nav">
+                      <ul class="o-list c-nav__list intro-sec">
+                        <li class="c-nav__item c-nav__item--cta js-shutdown "><a href="#!" class="c-link-pap ">shutdown system</a></li>
+                    </ul>
                     </nav>
                 </div>
             </div>
     </header>
 
-    <div class="c-intro">
-        <section class="o-row">
-            <div class="o-container">
-                <div class="o-layout o-layout--gutter-lg o-layout--align-center o-layout--row-reverse">
-                    <div class="o-layout__item u-1-of-2-bp3 u-3-of-5-bp4">
-                        <figure class="c-figure">
-                            <img class ="wide-screen-only" src="img/cocktail.jpg" alt="Intro visual">
-                        </figure>
-                    </div>
+    <div class="c-intro-stat">
+      <section class="">
+        <div class="o-container">
+            <div class="o-layout o-layout--gutter-lg o-layout--align-center o-layout--row-reverse c-live">
+                <div class="o-layout__item u-1-of-2-bp3 u-3-of-5-bp4">
+                  <div class="c-chart js-chart-cocktail-popularity-big wide-screen-only"></div>
+                </div>
 
                     <div class="o-layout__item u-1-of-2-bp3 u-2-of-5-bp4">
                         <div class="u-max-width-sm">
@@ -134,13 +135,12 @@
                                 Live Analytics
                             </h2>
                             <div class="js-live">
-                            <p class="u-mb-lg u-typography-third-base js-temperature">
-                            Temperature:</p>
-                            <p class="u-mb-lg u-typography-third-base js-cocktail">
-                            Last cocktail made:</p>
+                              <p class="u-mb-lg u-typography-third-base js-temperature">
+                              Temperature:</p>
+                              <p class="u-mb-lg u-typography-third-base js-cocktail">
+                              Last cocktail:</p>
                             </div>
 
-                            <!-- <p class="note wide-screen-only">**This mix is entirely random, not a real cocktail</p> -->
                         </div>
                     </div>
                 </div>
@@ -149,7 +149,7 @@
     </div>
 
         <section class="analytics_section">
-            <div class="c-chart js-chart-cocktail-popularity"></div>
+          <div class="c-chart js-chart-cocktail-popularity-small"></div>
             <div class="c-chart js-chart-temperature"></div>
             <div class="c-chart js-chart-volumes"></div>
             <div class="c-chart js-chart-cocktail-history"></div>
