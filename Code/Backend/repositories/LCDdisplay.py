@@ -97,7 +97,7 @@ class Display:
         self.display_string(status_message_l1)
         self.go_to_address(2,0)
         self.display_string(status_message_l2)
-        display.go_to_address(2,0)
+        self.go_to_address(2,0)
         
 
     def scroll_text(self, line_choice, cursor_position, input_string, delay):

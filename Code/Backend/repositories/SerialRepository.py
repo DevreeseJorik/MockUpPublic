@@ -8,10 +8,17 @@ class SerialRepository:
     @staticmethod
     def get_ser():
         while True:
-            if ser.in_waiting > 0:
-                line = ser.readline().decode('utf-8').rstrip()  # recieve data from arduino
-                time.sleep(0.001)
-                return line
+            try:
+                if ser.in_waiting > 0:
+                    line = ser.readline().decode('utf-8').rstrip()  # recieve data from arduino
+                    time.sleep(0.001)
+                    return line
+            except UnicodeDecodeError:
+                print("Unicode Error, arduino crashed...")
+                return "crash"
+                
+
+
                 
 
     @staticmethod

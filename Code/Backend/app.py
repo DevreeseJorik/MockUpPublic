@@ -11,17 +11,21 @@ from repositories.Cocktail import Cocktail
 from repositories.OneWire import OneWire
 from repositories.SerialRepository import SerialRepository
 from subprocess import call
-# from repositories.LCDdisplay import Display
+from repositories.LCDdisplay import Display
 
 GPIO.setwarnings(False)
 
 one_wire = OneWire()
-# display = Display()
+display = Display()
 cocktail = Cocktail()
+
+SerialRepository.send_ser("Booted")
 
 # Code for Hardware
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
+
+start_values = []
 
 
 # Flask
@@ -42,7 +46,7 @@ def slow_loop():
         while True:
             temp_val = one_wire.read_temp()
             DataRepository.put_device_history(1,action_id=None,value=temp_val,comment=None)
-            emit('B2F_current_temperature',round(temp_val,2))
+            SerialRepository.send_ser("Sen:All")
             time.sleep(10)
 
 def fast_loop():
@@ -60,14 +64,33 @@ def fast_loop():
                 cocktail.waiting = False
                 print(f"Drink has been completed")
                 cocktail.make_next_cocktail_from_queue()
-                SerialRepository.send_ser("Sen:All")
 
-            if "Sensor" in line:
+            if "Sensor" in line:     
                 split_line = line.split(":")
                 print(split_line)
-                id = split_line[1]   # add 6 when sending to database, first 6 are other devices
-                value = split_line[2] + cocktail.beveragevolumes[id]
-                DataRepository.put_device_history(id+6,action_id=None,value=value,comment=None)
+                id = int(split_line[1])   # add 6 when sending to database, first 7 are other devices + id 0 goes unused
+                sent_value = float(split_line[2])
+                
+                if len(start_values) <6 :
+                    start_values.append(sent_value)
+                    print(f"Start value set to {start_values[id]}")
+
+                volume = sent_value - start_values[id] + cocktail.beveragevolumes[id]
+                print(f"current volume: {volume}")
+
+                if ((sent_value - start_values[id]) > 1) | ((sent_value-start_values[id]) < -1.5):
+                    DataRepository.put_device_history(id+8,action_id=None,value=None,comment=None)
+                    print(f"The incoming volume has an impossible value {sent_value},{start_values[id]}")
+                else:
+                    value = sent_value + cocktail.beveragevolumes[id]
+                    DataRepository.put_device_history(id+8,action_id=None,value=value,comment=None)
+
+            if "crash" in line:
+                max_cocktails = DataRepository.get_total_cocktails()["count"]
+                if cocktail.rotary_id < max_cocktails:
+                    display.display_drink_with_row_number(cocktail.rotary_id)
+                else:
+                    display.display_extra_screen(cocktail.rotary_id-max_cocktails)
             
                 
 
