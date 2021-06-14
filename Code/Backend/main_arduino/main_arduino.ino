@@ -82,11 +82,7 @@ void sendWeights() {
     String tempText = "";
     for (int i = 0; i < reader.doutLen; ++i) {
       float gram = parser.parseToGram(reader.values[i]) - offsetGrams[i];
-<<<<<<< HEAD
       /*tempText += String(i) + ":" + String(gram/1000);*/
-=======
-      tempText += String(i) + ":" + String(gram/1000);
->>>>>>> ea39c203b2953e3d82a0995480ebcf2b2b49881c
       Serial.print("Sensor:" + String(i) + ": " + String(gram/1000));
       Serial.println("");
     }/*
