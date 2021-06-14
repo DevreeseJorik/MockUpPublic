@@ -1,6 +1,7 @@
 from RPi import GPIO
 import time
 from .DataRepository import DataRepository
+from subprocess import check_output
 
 GPIO.setwarnings(False)
 
@@ -84,6 +85,19 @@ class Display:
         self.display_string(cocktail_name)
         self.go_to_address(2,0)
         self.display_string(str(cocktail_id))
+        
+    def display_extra_screen(self,id):
+        print(id)
+        self.clear_lcd()
+        requested_ip = check_output(['hostname', '--all-ip-addresses']).decode('utf-8').strip()
+        status_message_l1 = "E" + requested_ip.split(" ")[0]
+        status_message_l2 = "W" + requested_ip.split(" ")[1]
+        print(status_message_l1, status_message_l2)
+        self.go_to_address(1,0)
+        self.display_string(status_message_l1)
+        self.go_to_address(2,0)
+        self.display_string(status_message_l2)
+        display.go_to_address(2,0)
         
 
     def scroll_text(self, line_choice, cursor_position, input_string, delay):
