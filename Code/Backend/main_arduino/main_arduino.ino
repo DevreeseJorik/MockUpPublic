@@ -2,7 +2,7 @@
 
 #include <HX711_asukiaaa.h>
 
-int pinsDout[] = {A0};
+int pinsDout[] = {A0,A1,A2,A3,A4,A5};
 const int numPins = sizeof(pinsDout) / sizeof(pinsDout[0]);
 int pinSlk = 9;
 HX711_asukiaaa::Reader reader(pinsDout, numPins, pinSlk);
@@ -40,7 +40,7 @@ bool systemReady = false;
 
 // declaratie pinnen
 
-int pinsPumps[] = {2,3,4,5,6,7};
+int pinsPumps[] = {7,6,5,4,3,2};
 int pinButton = 8;
 int pinsSensors[] = {};
 
@@ -82,12 +82,16 @@ void sendWeights() {
     String tempText = "";
     for (int i = 0; i < reader.doutLen; ++i) {
       float gram = parser.parseToGram(reader.values[i]) - offsetGrams[i];
+<<<<<<< HEAD
+      /*tempText += String(i) + ":" + String(gram/1000);*/
+=======
       tempText += String(i) + ":" + String(gram/1000);
+>>>>>>> ea39c203b2953e3d82a0995480ebcf2b2b49881c
       Serial.print("Sensor:" + String(i) + ": " + String(gram/1000));
       Serial.println("");
-    }
+    }/*
     Serial.println("");
-    Serial.println("Sen:" + tempText);
+    Serial.println("Sen:" + tempText);*/
   }
 }
 
@@ -146,6 +150,10 @@ void loop() {
 
       if (serialData.indexOf("Sen:") == 0) {
         sendWeights();
+      }
+
+      if (serialData.indexOf("Boot") == 0) {
+        systemReady = false;
       }
     }
 
