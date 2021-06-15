@@ -144,14 +144,14 @@ hr {
 }
 
 a {
-  color: #d2e673;
+  color: #ffffff;
   transition: all .1s ease-in-out;
 }
 
 a:visited,
 a:active,
 a:focus {
-  color: #748c00
+  color: #748c00;
 }
 
 a:hover {
@@ -533,8 +533,12 @@ a:hover {
   color:#FFFFFF;
 }
 
+.c-current {
+  color: #748c00 !important;
+}
+
 .c-current:visited {
-  color: #cee65c;
+  color: #cee65c !important;
 }
 
 .c-nav__link:active,

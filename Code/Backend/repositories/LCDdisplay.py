@@ -90,8 +90,15 @@ class Display:
         # print(id)
         self.clear_lcd()
         requested_ip = check_output(['hostname', '--all-ip-addresses']).decode('utf-8').strip()
-        status_message_l1 = "E" + requested_ip.split(" ")[0]
-        status_message_l2 = "W" + requested_ip.split(" ")[1]
+        print(requested_ip)
+        split_ip = requested_ip.split(" ")
+        if len(split_ip) ==2:
+            status_message_l1 = "E" + requested_ip.split(" ")[0]
+            status_message_l2 = "W" + requested_ip.split(" ")[1]
+        elif len(split_ip) == 1 :
+            status_message_l1 = "W" + requested_ip.split(" ")[0]
+            status_message_l2 = ""
+
         # print(status_message_l1, status_message_l2)
         self.go_to_address(1,0)
         self.display_string(status_message_l1)

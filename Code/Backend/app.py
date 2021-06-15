@@ -25,8 +25,6 @@ SerialRepository.send_ser("Booted")
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
-start_values = []
-
 
 # Flask
 
@@ -50,46 +48,49 @@ def slow_loop():
             time.sleep(10)
 
 def fast_loop():
-        while True:
-            line = SerialRepository.get_ser()
-            if line == "First glass put down":
-                cocktail.waiting = False
-                cocktail.make_next_cocktail_from_queue()
+    global start_values
+    start_values = []
+    while True:
+        line = SerialRepository.get_ser()
+        if line == "First glass put down":
+            cocktail.waiting = False
+            cocktail.make_next_cocktail_from_queue()
 
-            if "Val" in line:
-                print(f"\nReceiving Serial:\n{line}")
+        if "Val" in line:
+            print(f"\nReceiving Serial:\n{line}")
 
-            if line == "Finished cocktailprocess":
-                # print("Cocktailprocess finished")
-                cocktail.waiting = False
-                # print(f"Drink has been completed")
-                cocktail.make_next_cocktail_from_queue()
+        if line == "Finished cocktailprocess":
+            # print("Cocktailprocess finished")
+            cocktail.waiting = False
+            # print(f"Drink has been completed")
+            cocktail.make_next_cocktail_from_queue()
 
-            if "Sensor" in line:     
-                split_line = line.split(":")
-                # print(split_line)
-                id = int(split_line[1])   # add 6 when sending to database, first 7 are other devices + id 0 goes unused
-                sent_value = float(split_line[2])
-                
-                if len(start_values) <6 :
-                    start_values.append(sent_value)
-                    # print(f"Start value set to {start_values[id]}")
+        if "Sensor" in line:     
+            split_line = line.split(":")
+            # print(split_line)
+            id = int(split_line[1])   # add 6 when sending to database, first 7 are other devices + id 0 goes unused
+            sent_value = float(split_line[2])
+            
+            if len(start_values) <6 :
+                start_values.append(sent_value)
+                # print(f"Start value set to {start_values[id]}")
 
-                volume = sent_value - start_values[id] + cocktail.beveragevolumes[id]
-                # print(f"current volume: {volume}")
+            volume = sent_value - start_values[id] + cocktail.beveragevolumes[id]
+            # print(f"current volume: {volume}")
 
-                if ((sent_value - start_values[id]) > 1) | ((sent_value-start_values[id]) < -1.5):
-                    DataRepository.put_device_history(id+8,action_id=None,value=None,comment=None)
-                    # print(f"The incoming volume has an impossible value {sent_value},{start_values[id]}")
-                else:
-                    DataRepository.put_device_history(id+8,action_id=None,value=volume,comment=None)
+            if ((sent_value - start_values[id]) > 1) | ((sent_value-start_values[id]) < -1.5):
+                DataRepository.put_device_history(id+8,action_id=None,value=None,comment=None)
+                # print(f"The incoming volume has an impossible value {sent_value},{start_values[id]}")
+            else:
+                DataRepository.put_device_history(id+8,action_id=None,value=volume,comment=None)
 
-            if "crash" in line:
-                max_cocktails = DataRepository.get_total_cocktails()["count"]
-                if cocktail.rotary_id < max_cocktails:
-                    display.display_drink_with_row_number(cocktail.rotary_id)
-                else:
-                    display.display_extra_screen(cocktail.rotary_id-max_cocktails)
+        if "crash" in line:
+            max_cocktails = DataRepository.get_total_cocktails()["count"]
+            start_values = []
+            if cocktail.rotary_id < max_cocktails:
+                display.display_drink_with_row_number(cocktail.rotary_id)
+            else:
+                display.display_extra_screen(cocktail.rotary_id-max_cocktails)
             
                 
 
@@ -110,6 +111,7 @@ def hallo():
 @socketio.on('connect')
 def initial_connection():
     print('A new client connected')
+    emit("connection_established")
 
 @socketio.on("F2B_request_data")
 def return_main_data(data):
@@ -121,8 +123,8 @@ def return_main_data(data):
         # print("Cocktail data sent")
 
     if data["url"] == "Stats.html":
-        temperature = DataRepository.get_latest_rows_device_history(1,'1')
-        emit('B2F_current_temperature',round(temperature[0]['value'],2))
+        temperature = DataRepository.get_latest_rows_device_history(1,1)
+        emit('B2F_current_temperature',round(temperature[0]['value'],2)) 
 
         pumps_volume = DataRepository.get_all_beverages()
         emit('B2F_current_volume', pumps_volume)

@@ -119,10 +119,10 @@ class DataRepository:
     @staticmethod
     def get_latest_rows_device_history(limit=1,id=None):
         if id != None:
-            sql = 'select h.deviceId,date_format(h.date,"%d/%m/%y") as date,date_format(h.date,"%h:%m:%s") as time,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where h.deviceId = %s order by date desc limit %s'
+            sql = 'select h.deviceId,date_format(h.date,"%d/%m/%y") as date,date_format(h.date,"%h:%m:%s") as time,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where h.deviceId = %s order by h.historyId desc limit %s'
             params = ["%s",id,limit]
         else:
-            sql = 'select h.deviceId,date_format(h.date,"%d/%m/%y") as date,date_format(h.date,"%h:%m:%s") as time,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where h.deviceId = %s order by date desc limit %s'
+            sql = 'select h.deviceId,date_format(h.date,"%d/%m/%y") as date,date_format(h.date,"%h:%m:%s") as time,d.name,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where h.deviceId = %s order by h.historyId desc limit %s'
             params = ["%s",limit]
         return Database.get_rows(sql,params)
 
@@ -140,10 +140,10 @@ class DataRepository:
                     else:
                         sql += '%s'
                 params.append(limit)
-                sql += ') order by date desc limit %s'
+                sql += ') order by historyId desc limit %s'
 
         else:
-            sql = 'select h.deviceId,d.name,date_format(date,"%d/%m/%y") as date, date_format(date,"%h:%m") as time,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" order by date desc limit %s'
+            sql = 'select h.deviceId,d.name,date_format(date,"%d/%m/%y") as date, date_format(date,"%h:%m") as time,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" order by historyId desc limit %s'
             params = [limit]
         return Database.get_rows(sql,params)
 

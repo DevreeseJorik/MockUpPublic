@@ -308,7 +308,7 @@ const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNam
     shared: false,
     y: {
       formatter: function (val) {
-        return (val / 1000000).toFixed(0)
+        return (val)
       }
     }
   },
@@ -493,7 +493,7 @@ const drawBarChart = function(categories,data,chartSelector,chartName,sign) {
 // Socket listening
 
 const listenToSocket = function () {
-  socket.on("connected", function () {
+  socket.on("connection_established", function () {
     // console.log("Connection established.");
   });
 
@@ -544,7 +544,7 @@ const listenToSocketStat = function() {
 
   socket.on("B2F_sensor_history", function (jsonObject) {
     // console.log("Received sensor history")
-    // console.log(jsonObject);
+    console.log(jsonObject);
     showHistorySensors(jsonObject);
   });
 
