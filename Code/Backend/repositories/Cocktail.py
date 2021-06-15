@@ -41,7 +41,7 @@ class Cocktail:
         beverages = DataRepository.get_all_beverages()
         for beverage in beverages:
             self.beveragevolumes.append(beverage["currentVolume"])
-        print(self.beveragevolumes)
+        # print(self.beveragevolumes)
 
 
     def callback_clk(self, pin):
@@ -55,7 +55,7 @@ class Cocktail:
                 # self.counter -= 1
                 # if self.counter < -1:
                 # self.counter = 0
-                print("Turning left")
+                # print("Turning left")
                 self.rotary_id = (self.rotary_id  - 1)
                 if self.rotary_id < 0:
                     self.rotary_id = max_cocktails + self.extra_screens - 1
@@ -64,7 +64,7 @@ class Cocktail:
                 # self.counter += 1
                 # if self.counter > 1:
                 # self.counter = 0
-                print("Turning right")
+                # print("Turning right")
                 self.rotary_id = (self.rotary_id  + 1) % (max_cocktails + self.extra_screens)
 
 
@@ -77,11 +77,11 @@ class Cocktail:
     def callback_sw(self, pin):
         if pin == 16:
             if self.rotary_id == 0:
-                print("\nUser chose random drink!")
+                # print("\nUser chose random drink!")
                 self.make_random_recipe()
                 return
             elif self.rotary_id < DataRepository.get_total_cocktails()["count"]:
-                print(f"Received request to make cocktail: {self.rotary_id}")
+                # print(f"Received request to make cocktail: {self.rotary_id}")
                 recipe = DataRepository.get_recipe_by_cocktail_id(self.rotary_id)
                 self.make_cocktail(recipe,self.rotary_id)
                 DataRepository.put_device_history(14,action_id=2)
@@ -90,18 +90,18 @@ class Cocktail:
         self.queue.append([recipe,cocktail_id])
         cocktail = DataRepository.get_cocktail_by_id(cocktail_id)
         cocktail_name = cocktail["name"]
-        print(f"\nAdded {cocktail_name} to queue.")
+        # print(f"\nAdded {cocktail_name} to queue.")
 
     def make_next_cocktail_from_queue(self):
         self.waiting = False
         if len(self.queue) != 0:
-            print(f"\nMaking next cocktail in queue. {len(self.queue)-1} cocktails left in queue.")
+            # print(f"\nMaking next cocktail in queue. {len(self.queue)-1} cocktails left in queue.")
             recipe = self.queue[0][0]
             cocktail_id = self.queue[0][1]
             self.make_cocktail(recipe,cocktail_id)
             self.remove_first_from_queue()
             return
-        print("\nQueue is now empty.")
+        # print("\nQueue is now empty.")
 
     def remove_first_from_queue(self):
         if (len(self.queue) != 0):
@@ -129,15 +129,15 @@ class Cocktail:
         cocktail = DataRepository.get_cocktail_by_id(cocktail_id)
         cocktail_name = cocktail["name"]
 
-        print(f"\nMaking: {cocktail_name}")
-        print("The recipe is as follows:")
+        # print(f"\nMaking: {cocktail_name}")
+        # print("The recipe is as follows:")
         SerialRepository.send_ser("Act:Start")
         for beverage in recipe:
             beverage_id = beverage["beverageId"]
             volume = beverage["volume"]*10**3
             beverage = DataRepository.get_beverage_by_id(beverage_id)
             beverage_name = beverage["beverageName"]
-            print(f"\t{volume} ml {beverage_name}")
+            # print(f"\t{volume} ml {beverage_name}")
             SerialRepository.send_ser(f"Act:{beverage_id}:{volume}")
             DataRepository.put_device_history(device_id=beverage_id+1,action_id=1,value=volume,comment=str(cocktail_name))
         

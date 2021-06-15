@@ -9,7 +9,7 @@ const listenToUIMenu = function () {
     // console.log(button);
     button.addEventListener("click",function () {
       let value = button.getAttribute("value");
-      console.log(value);
+      // console.log(value);
       socket.emit('F2B_request_cocktail',{'cocktail_id':value});
   });
   }
@@ -19,7 +19,7 @@ const addCocktails = function (jsonObject) {
   let htmlCocktail = document.querySelector(".cocktail_section");
   // console.log(htmlCocktail);
   let dataCocktails = "";
-  console.log(screen.width)
+  // console.log(screen.width)
 
   if (screen.width > 997) {
     for (let cocktail of jsonObject.cocktails) {
@@ -149,7 +149,7 @@ const showCurrentTemperature = function(temperature) {
 
 const showLatestCocktail = function(cocktail) {
   let htmlDevice = document.querySelector(".js-cocktail")
-  console.log(cocktail)
+  // console.log(cocktail)
   htmlDevice.innerHTML = `Last cocktail: ${cocktail[0].name}`
 }
 
@@ -174,7 +174,7 @@ const showCocktailPopularity = function(jsonObject) {
 }
 
 const showHistorySensors = function(jsonObject) {
-  console.log(jsonObject)
+  // console.log(jsonObject)
   let convertedCategoriesTemp= [];
   let convertedDataTemp  = [];
 
@@ -188,15 +188,15 @@ const showHistorySensors = function(jsonObject) {
     };
     drawLineChart(convertedCategoriesTemp,convertedDataTemp,'.js-chart-temperature','Time','Temperature','Temperature measurements',10,36);
     for (const element of jsonObject.volume) {
-      convertedCategoriesVolume.push(`Drink ${element.deviceId}`);
+      convertedCategoriesVolume.push(`Drink ${(element.deviceId)-7}`);
       convertedDataVolume.push(element.value);
     };
-    drawBarChart(convertedCategoriesVolume,convertedDataVolume,'.js-chart-volumes','Volume measurements');
+    drawBarChart(convertedCategoriesVolume,convertedDataVolume,'.js-chart-volumes','Volume measurements',"l");
   };
 }
 
 const showHistoryCocktail = function(jsonObject) {
-  console.log(jsonObject)
+  // console.log(jsonObject)
   let convertedCategories= [];
   let convertedData  = [];
 
@@ -322,9 +322,9 @@ const drawLineChart = function(categories,data,chartSelector,chartNameX,chartNam
 
 
 const drawLineChart2 = function(categories,data,chartSelector,chartNameX,chartNameY,chartName,min,max,sign="ml") {
-  console.log(data)
-  console.log(categories)
-  console.log(chartName)
+  // console.log(data)
+  // console.log(categories)
+  // console.log(chartName)
 
   var options = {
     series: data,
@@ -494,19 +494,19 @@ const drawBarChart = function(categories,data,chartSelector,chartName,sign) {
 
 const listenToSocket = function () {
   socket.on("connected", function () {
-    console.log("Connection established.");
+    // console.log("Connection established.");
   });
 
   let url = window.location.pathname.split('/');
   // console.log(url);  
   if ((url[1] == "Menu.html") | (url[4] == "Menu.html")) {
-    console.log("Welcome to the Menu Page.");
+    // console.log("Welcome to the Menu Page.");
     page = "Menu.html"
     
   } 
   
   if ((url[1] == "Stats.html") | (url[4] == "Stats.html")) {
-    console.log("Welcome to the Analytics Page");
+    // console.log("Welcome to the Analytics Page");
     page = "Stats.html"
   }
 
@@ -518,7 +518,7 @@ const listenToSocket = function () {
 
 const listenToSocketMenu = function() {
   socket.on("B2F_cocktail_menu", function (jsonObject) {
-    console.log("Received cocktail list");
+    // console.log("Received cocktail list");
     console.log(jsonObject);
     addCocktails(jsonObject);
   });
@@ -526,24 +526,24 @@ const listenToSocketMenu = function() {
 
 const listenToSocketStat = function() {
   socket.on("B2F_current_temperature", function (temperature) {
-    console.log("Received current temperature");
+    // console.log("Received current temperature");
     // console.log(jsonObject);
     showCurrentTemperature(temperature);
   });
 
   socket.on("B2F_latest_cocktail", function (jsonObject) {
-    console.log("Received actuator list");
+    // console.log("Received actuator list");
     showLatestCocktail(jsonObject);
   });
 
   socket.on("B2F_cocktail_popularity", function (jsonObject) {
-    console.log("Received cocktail popularity");
+    // console.log("Received cocktail popularity");
     // console.log(jsonObject);
     showCocktailPopularity(jsonObject);    
   });
 
   socket.on("B2F_sensor_history", function (jsonObject) {
-    console.log("Received sensor history")
+    // console.log("Received sensor history")
     // console.log(jsonObject);
     showHistorySensors(jsonObject);
   });
@@ -551,13 +551,13 @@ const listenToSocketStat = function() {
 
 
   socket.on("B2F_actuator_history", function (jsonObject) {
-    console.log("Received actuator list");
+    // console.log("Received actuator list");
     showHistoryActuator(jsonObject);
   });
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  console.info("DOM geladen");
+  // console.info("DOM geladen");
   listenToSocket();
   document.querySelector(".js-shutdown").addEventListener('click',function() {socket.emit("F2B_shutdown")});
 });

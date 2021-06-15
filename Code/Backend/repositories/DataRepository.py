@@ -129,8 +129,19 @@ class DataRepository:
     @staticmethod
     def get_latest_rows_sensor_history(limit=10,ids=None):
         if ids != None:
-            sql = 'select h.deviceId,d.name,date_format(date,"%d/%m/%y") as date, date_format(date,"%h:%m") as time,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" and d.deviceId in (%s) order by date desc limit %s'
-            params = [ids,limit]
+            if type(ids) == list: 
+                params = []
+                sql = 'select h.deviceId,d.name,date_format(date,"%d/%m/%y") as date, date_format(date,"%h:%m") as time,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" and d.deviceId in ('
+
+                for i in range(len(ids)):
+                    params.append(ids[i])
+                    if i != (len(ids)-1):
+                        sql += '%s,'
+                    else:
+                        sql += '%s'
+                params.append(limit)
+                sql += ') order by date desc limit %s'
+
         else:
             sql = 'select h.deviceId,d.name,date_format(date,"%d/%m/%y") as date, date_format(date,"%h:%m") as time,h.value,d.description,d.type FROM devicehistory h join device d on h.deviceid = d.deviceid where d.type = "sensor" order by date desc limit %s'
             params = [limit]

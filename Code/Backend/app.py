@@ -60,30 +60,29 @@ def fast_loop():
                 print(f"\nReceiving Serial:\n{line}")
 
             if line == "Finished cocktailprocess":
-                print("Cocktailprocess finished")
+                # print("Cocktailprocess finished")
                 cocktail.waiting = False
-                print(f"Drink has been completed")
+                # print(f"Drink has been completed")
                 cocktail.make_next_cocktail_from_queue()
 
             if "Sensor" in line:     
                 split_line = line.split(":")
-                print(split_line)
+                # print(split_line)
                 id = int(split_line[1])   # add 6 when sending to database, first 7 are other devices + id 0 goes unused
                 sent_value = float(split_line[2])
                 
                 if len(start_values) <6 :
                     start_values.append(sent_value)
-                    print(f"Start value set to {start_values[id]}")
+                    # print(f"Start value set to {start_values[id]}")
 
                 volume = sent_value - start_values[id] + cocktail.beveragevolumes[id]
-                print(f"current volume: {volume}")
+                # print(f"current volume: {volume}")
 
                 if ((sent_value - start_values[id]) > 1) | ((sent_value-start_values[id]) < -1.5):
                     DataRepository.put_device_history(id+8,action_id=None,value=None,comment=None)
-                    print(f"The incoming volume has an impossible value {sent_value},{start_values[id]}")
+                    # print(f"The incoming volume has an impossible value {sent_value},{start_values[id]}")
                 else:
-                    value = sent_value + cocktail.beveragevolumes[id]
-                    DataRepository.put_device_history(id+8,action_id=None,value=value,comment=None)
+                    DataRepository.put_device_history(id+8,action_id=None,value=volume,comment=None)
 
             if "crash" in line:
                 max_cocktails = DataRepository.get_total_cocktails()["count"]
@@ -100,7 +99,7 @@ thread.start()
 thread2 = threading.Timer(0.001, fast_loop)
 thread2.start()
 
-print("**** Program started ****")
+# print("**** Program started ****")
 
 # API endpoints
 
@@ -110,8 +109,7 @@ def hallo():
 
 @socketio.on('connect')
 def initial_connection():
-    print('A new client connect')
-    # # Send to the client!
+    print('A new client connected')
 
 @socketio.on("F2B_request_data")
 def return_main_data(data):
@@ -120,7 +118,7 @@ def return_main_data(data):
     if data["url"] == "Menu.html":
         cocktails = DataRepository.read_all_cocktails()
         emit('B2F_cocktail_menu', {'cocktails': cocktails})
-        print("Cocktail data sent")
+        # print("Cocktail data sent")
 
     if data["url"] == "Stats.html":
         temperature = DataRepository.get_latest_rows_device_history(1,'1')
@@ -138,9 +136,9 @@ def return_main_data(data):
         count_cocktails = DataRepository.get_cocktail_count()
         emit('B2F_cocktail_popularity',count_cocktails)
 
-        temperature_history = DataRepository.get_latest_rows_sensor_history(15,'1')
+        temperature_history = DataRepository.get_latest_rows_sensor_history(15,[1])
 
-        volume_history = DataRepository.get_latest_rows_sensor_history(15,'2,3,4,5,6,7')
+        volume_history = DataRepository.get_latest_rows_sensor_history(15,[8,9,10,11,12,13])
         emit('B2F_sensor_history',{'temperature':temperature_history,'volume':volume_history})
 
         actuator_history = DataRepository.get_latest_rows_actuator_history(20)
@@ -157,7 +155,7 @@ def listen_to_cocktail_request(data):
     cocktail_id = data["cocktail_id"]
 
     if str(cocktail_id) in ["0","random"]:
-        print("\nUser chose random drink!")
+        # print("\nUser chose random drink!")
         cocktail.make_random_recipe()
         return
 
@@ -167,7 +165,7 @@ def listen_to_cocktail_request(data):
 
 @socketio.on('F2B_shutdown')
 def shutdown_pi():
-    print("shutdown initiliased")
+    # print("shutdown initiliased")
     call(" echo 'W8w00rd' | sudo -S sudo shutdown -h now", shell=True)
 
 

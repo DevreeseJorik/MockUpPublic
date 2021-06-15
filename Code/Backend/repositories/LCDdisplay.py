@@ -87,12 +87,12 @@ class Display:
         self.display_string(str(cocktail_id))
         
     def display_extra_screen(self,id):
-        print(id)
+        # print(id)
         self.clear_lcd()
         requested_ip = check_output(['hostname', '--all-ip-addresses']).decode('utf-8').strip()
         status_message_l1 = "E" + requested_ip.split(" ")[0]
         status_message_l2 = "W" + requested_ip.split(" ")[1]
-        print(status_message_l1, status_message_l2)
+        # print(status_message_l1, status_message_l2)
         self.go_to_address(1,0)
         self.display_string(status_message_l1)
         self.go_to_address(2,0)
@@ -130,7 +130,7 @@ if __name__ == '__main__':
         while True:
             display.go_to_address(1,0)
             display.display_string("Test")
-            print("test")
+            # print("test")
             time.sleep(6)
     except Exception as e:
         print(e)

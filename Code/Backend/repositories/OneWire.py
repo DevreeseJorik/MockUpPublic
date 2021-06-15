@@ -4,13 +4,13 @@ class OneWire:
         self.filename = f'/sys/bus/w1/devices/{device_id}/w1_slave'
 
     def read_temp(self):
-        print('\n*** Reading temperature **')
+        # print('\n*** Reading temperature **')
         sensor_file = open(self.filename, 'r')
         for line in sensor_file:
             if 't=' in line:
                 line = line.strip("\n")
                 line = line.split('t=')
                 temperature = float(line[1])/1000
-                print(f"Current temperature is: {temperature} °C")
+                # print(f"Current temperature is: {temperature} °C")
         sensor_file.close()
         return temperature
